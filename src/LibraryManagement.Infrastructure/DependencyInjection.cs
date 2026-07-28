@@ -1,5 +1,7 @@
 using LibraryManagement.Infrastructure.Data;
 using LibraryManagement.Infrastructure.Initialization;
+using LibraryManagement.Infrastructure.Services;
+using LibraryManagement.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +28,41 @@ public static class DependencyInjection
                 .UseSqlite(connectionString)
                 .EnableDetailedErrors());
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
+        services.AddSingleton<ICurrentUserService, CurrentUserService>();
+        services.AddSingleton<IPasswordHasher>(
+            _ => new BcryptPasswordHasher(GetBcryptWorkFactor(configuration)));
+        services.AddSingleton<ILoginPreferenceService>(
+            serviceProvider => new JsonLoginPreferenceService(
+                GetLoginPreferenceFilePath(configuration),
+                serviceProvider.GetRequiredService<
+                    Microsoft.Extensions.Logging.ILogger<JsonLoginPreferenceService>>()));
+        services.AddSingleton<IAuthenticationService, AuthenticationService>();
 
         return services;
+    }
+
+    private static int GetBcryptWorkFactor(IConfiguration configuration)
+    {
+        string? configuredValue = configuration["Security:BCryptWorkFactor"];
+        if (!int.TryParse(
+                configuredValue,
+                System.Globalization.NumberStyles.None,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out int workFactor))
+        {
+            throw new InvalidOperationException(
+                "Cấu hình 'Security:BCryptWorkFactor' không hợp lệ.");
+        }
+
+        return workFactor;
+    }
+
+    private static string GetLoginPreferenceFilePath(IConfiguration configuration)
+    {
+        string configuredPath = configuration["Storage:LoginPreferencesFile"]
+            ?? throw new InvalidOperationException(
+                "Không tìm thấy cấu hình 'Storage:LoginPreferencesFile'.");
+
+        return Environment.ExpandEnvironmentVariables(configuredPath);
     }
 }

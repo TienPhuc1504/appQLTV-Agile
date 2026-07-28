@@ -4,39 +4,87 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:LibraryManagement.App.Views.Pages"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="{Binding ApplicationName}"
-    Width="960"
-    Height="600"
-    MinWidth="720"
-    MinHeight="450"
+    Width="1100"
+    Height="700"
+    MinWidth="800"
+    MinHeight="520"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid Background="{DynamicResource ApplicationBackgroundBrush}">
+    <Grid>
+        <ui:NavigationView
+            x:Name="RootNavigation"
+            IsBackButtonVisible="Visible"
+            IsPaneToggleVisible="True"
+            PaneDisplayMode="Left"
+            PaneTitle="Thư viện">
+            <ui:NavigationView.MenuItems>
+                <ui:NavigationViewItem
+                    Content="Nền tảng ứng dụng"
+                    Icon="{ui:SymbolIcon Home24}"
+                    TargetPageType="{x:Type pages:FoundationPage}" />
+            </ui:NavigationView.MenuItems>
+            <ui:NavigationView.FooterMenuItems>
+                <ui:NavigationViewItem
+                    Content="Cài đặt"
+                    Icon="{ui:SymbolIcon Settings24}"
+                    IsEnabled="False"
+                    Visibility="{Binding CanManageSystemSettings, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            </ui:NavigationView.FooterMenuItems>
+        </ui:NavigationView>
+
         <Border
-            Width="520"
-            Padding="40"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Margin="0,0,20,0"
+            Padding="12,6"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
             Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-            CornerRadius="12">
-            <StackPanel>
-                <TextBlock
-                    HorizontalAlignment="Center"
-                    FontSize="32"
-                    FontWeight="SemiBold"
-                    Text="{Binding ApplicationName}" />
-                <TextBlock
-                    Margin="0,16,0,0"
-                    HorizontalAlignment="Center"
-                    FontSize="16"
-                    Text="{Binding WelcomeMessage}" />
+            CornerRadius="8">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="0,0,12,0">
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        FontWeight="SemiBold"
+                        Text="{Binding CurrentEmployeeName}" />
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        FontSize="11"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="{Binding CurrentEmployeeRole}" />
+                </StackPanel>
                 <ui:Button
-                    Margin="0,28,0,0"
-                    HorizontalAlignment="Center"
-                    Appearance="Primary"
-                    Content="Sẵn sàng phát triển" />
+                    Command="{Binding ToggleThemeCommand}"
+                    Icon="{ui:SymbolIcon WeatherMoon24}"
+                    ToolTip="{Binding ThemeButtonText}" />
+                <ui:Button
+                    Margin="8,0,0,0"
+                    AutomationProperties.Name="Đăng xuất"
+                    Command="{Binding LogoutCommand}"
+                    Icon="{ui:SymbolIcon SignOut24}"
+                    ToolTip="Đăng xuất" />
             </StackPanel>
         </Border>
+
+        <Border
+            Panel.ZIndex="100"
+            Background="#66000000"
+            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock
+                    Margin="0,12,0,0"
+                    Foreground="White"
+                    Text="{Binding BusyMessage}" />
+            </StackPanel>
+        </Border>
+
+        <ui:SnackbarPresenter
+            x:Name="RootSnackbarPresenter"
+            Panel.ZIndex="200" />
+        <ui:ContentDialogHost
+            x:Name="RootContentDialogHost"
+            Panel.ZIndex="300" />
     </Grid>
 </ui:FluentWindow>

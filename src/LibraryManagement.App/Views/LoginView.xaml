@@ -1,0 +1,149 @@
+<ui:FluentWindow
+    x:Class="LibraryManagement.App.Views.LoginView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Đăng nhập - LibraryManagement"
+    Width="920"
+    Height="580"
+    MinWidth="760"
+    MinHeight="500"
+    ResizeMode="CanResize"
+    WindowStartupLocation="CenterScreen"
+    mc:Ignorable="d">
+    <Grid Background="{DynamicResource ApplicationBackgroundBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1.05*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border
+            Margin="24"
+            Padding="40"
+            Background="{DynamicResource AccentFillColorDefaultBrush}"
+            CornerRadius="16">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <Border
+                    Width="92"
+                    Height="92"
+                    Background="#28FFFFFF"
+                    CornerRadius="46">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="42"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Text="L" />
+                </Border>
+                <TextBlock
+                    Margin="0,28,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="30"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Text="LibraryManagement" />
+                <TextBlock
+                    MaxWidth="320"
+                    Margin="0,12,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="15"
+                    Foreground="#E6FFFFFF"
+                    Text="Hệ thống quản lý thư viện dành cho nhân viên và quản trị viên."
+                    TextAlignment="Center"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1" Margin="48,40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="1">
+                <TextBlock
+                    FontSize="28"
+                    FontWeight="SemiBold"
+                    Text="Đăng nhập" />
+                <TextBlock
+                    Margin="0,8,0,28"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="Nhập thông tin tài khoản nhân viên." />
+
+                <TextBlock
+                    Margin="0,0,0,6"
+                    FontWeight="SemiBold"
+                    Text="Tên đăng nhập" />
+                <ui:TextBox
+                    x:Name="UsernameTextBox"
+                    MinHeight="38"
+                    AutomationProperties.Name="Tên đăng nhập"
+                    Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                <TextBlock
+                    Margin="0,5,0,0"
+                    Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                    Text="{Binding UsernameValidationMessage}"
+                    TextWrapping="Wrap" />
+
+                <TextBlock
+                    Margin="0,12,0,6"
+                    FontWeight="SemiBold"
+                    Text="Mật khẩu" />
+                <PasswordBox
+                    x:Name="PasswordInput"
+                    MinHeight="38"
+                    Padding="10,6"
+                    AutomationProperties.Name="Mật khẩu"
+                    PasswordChanged="OnPasswordChanged" />
+                <TextBlock
+                    Margin="0,5,0,0"
+                    Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                    Text="{Binding PasswordValidationMessage}"
+                    TextWrapping="Wrap" />
+
+                <CheckBox
+                    Margin="0,12,0,0"
+                    Content="Ghi nhớ tên đăng nhập"
+                    IsChecked="{Binding RememberUsername}" />
+
+                <TextBlock
+                    Margin="0,14,0,0"
+                    Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                    Text="{Binding ErrorMessage}"
+                    TextWrapping="Wrap"
+                    Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                <ui:Button
+                    MinHeight="42"
+                    Margin="0,24,0,0"
+                    HorizontalAlignment="Stretch"
+                    Appearance="Primary"
+                    AutomationProperties.Name="Đăng nhập"
+                    Command="{Binding LoginCommand}"
+                    Content="Đăng nhập"
+                    IsDefault="True"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}" />
+            </StackPanel>
+
+            <Border
+                Grid.RowSpan="3"
+                Panel.ZIndex="10"
+                Background="#66000000"
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:ProgressRing IsIndeterminate="True" />
+                    <TextBlock
+                        Margin="0,12,0,0"
+                        Foreground="White"
+                        Text="{Binding BusyMessage}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</ui:FluentWindow>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\LibraryManagement.Core\LibraryManagement.Core.csproj" />
     <ProjectReference Include="..\..\src\LibraryManagement.Infrastructure\LibraryManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\LibraryManagement.App\LibraryManagement.App.csproj" />
   </ItemGroup>
 
 </Project>
