@@ -2,6 +2,7 @@ using FluentAssertions;
 using LibraryManagement.Core.Interfaces;
 using LibraryManagement.Infrastructure;
 using LibraryManagement.Infrastructure.Data;
+using LibraryManagement.Infrastructure.Repositories;
 using LibraryManagement.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,6 +42,24 @@ public sealed class InfrastructureDependencyInjectionTests
         provider.GetRequiredService<IAuthenticationService>()
             .Should()
             .BeOfType<AuthenticationService>();
+        provider.GetRequiredService<ICategoryRepository>()
+            .Should()
+            .BeOfType<CategoryRepository>();
+        provider.GetRequiredService<IAuthorRepository>()
+            .Should()
+            .BeOfType<AuthorRepository>();
+        provider.GetRequiredService<IPublisherRepository>()
+            .Should()
+            .BeOfType<PublisherRepository>();
+        provider.GetRequiredService<ICategoryService>()
+            .Should()
+            .BeOfType<CategoryService>();
+        provider.GetRequiredService<IAuthorService>()
+            .Should()
+            .BeOfType<AuthorService>();
+        provider.GetRequiredService<IPublisherService>()
+            .Should()
+            .BeOfType<PublisherService>();
     }
 
     [Fact]

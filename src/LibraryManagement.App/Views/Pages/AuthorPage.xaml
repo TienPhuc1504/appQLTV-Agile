@@ -1,0 +1,206 @@
+<Page
+    x:Class="LibraryManagement.App.Views.Pages.AuthorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Tác giả"
+    d:DesignHeight="650"
+    d:DesignWidth="1000"
+    Loaded="OnLoaded"
+    mc:Ignorable="d">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock FontSize="28" FontWeight="SemiBold" Text="Quản lý tác giả" />
+                <TextBlock
+                    Margin="0,6,0,0"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="Quản lý thông tin tác giả và tra cứu theo họ tên, quốc tịch." />
+            </StackPanel>
+            <ui:Button
+                Grid.Column="1"
+                MinWidth="110"
+                VerticalAlignment="Center"
+                Appearance="Primary"
+                Command="{Binding NewCommand}"
+                Content="Thêm mới" />
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,24,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="430" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBox
+                        MinHeight="38"
+                        PlaceholderText="Tìm theo họ tên hoặc quốc tịch..."
+                        Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                    <CheckBox
+                        Grid.Column="1"
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center"
+                        Content="Hiện ngừng sử dụng"
+                        IsChecked="{Binding IncludeInactive}" />
+                    <ui:Button
+                        Grid.Column="2"
+                        Margin="12,0,0,0"
+                        Command="{Binding SearchCommand}"
+                        Content="Tìm kiếm" />
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="0,14,0,0">
+                    <DataGrid
+                        x:Name="AuthorGrid"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding Items}"
+                        SelectedItem="{Binding SelectedItem}"
+                        SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="2*" Binding="{Binding FullName}" Header="Họ tên" />
+                            <DataGridTextColumn Width="*" Binding="{Binding DateOfBirth}" Header="Ngày sinh" />
+                            <DataGridTextColumn Width="*" Binding="{Binding Nationality}" Header="Quốc tịch" />
+                            <DataGridCheckBoxColumn Width="85" Binding="{Binding IsActive}" Header="Hoạt động" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="Không có tác giả phù hợp.">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HasItems, ElementName=AuthorGrid}" Value="False">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <TextBlock
+                    Grid.Row="2"
+                    Margin="0,10,0,0"
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Text="{Binding Items.Count, StringFormat=Tổng số: {0} tác giả}" />
+            </Grid>
+
+            <Border
+                Grid.Column="2"
+                Padding="22"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock FontSize="19" FontWeight="SemiBold" Text="{Binding EditorTitle}" />
+                        <TextBlock Margin="0,18,0,6" FontWeight="SemiBold" Text="Họ tên *" />
+                        <ui:TextBox
+                            x:Name="AuthorNameInput"
+                            MaxLength="150"
+                            Text="{Binding FullName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=AuthorNameInput}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding (Validation.HasError), ElementName=AuthorNameInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Ngày sinh" />
+                        <DatePicker
+                            x:Name="AuthorBirthDateInput"
+                            SelectedDate="{Binding DateOfBirth, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=AuthorBirthDateInput}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding (Validation.HasError), ElementName=AuthorBirthDateInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Quốc tịch" />
+                        <ui:TextBox
+                            x:Name="AuthorNationalityInput"
+                            MaxLength="100"
+                            Text="{Binding Nationality, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=AuthorNationalityInput}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding (Validation.HasError), ElementName=AuthorNationalityInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock Margin="0,12,0,6" FontWeight="SemiBold" Text="Tiểu sử" />
+                        <ui:TextBox
+                            x:Name="AuthorBiographyInput"
+                            MinHeight="100"
+                            MaxLength="4000"
+                            AcceptsReturn="True"
+                            Text="{Binding Biography, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=AuthorBiographyInput}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding (Validation.HasError), ElementName=AuthorBiographyInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <TextBlock
+                            Margin="0,12,0,0"
+                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                            Text="{Binding ErrorMessage}"
+                            TextWrapping="Wrap"
+                            Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <ui:Button
+                            MinHeight="40"
+                            Margin="0,18,0,0"
+                            HorizontalAlignment="Stretch"
+                            Appearance="Primary"
+                            Command="{Binding SaveCommand}"
+                            Content="Lưu tác giả" />
+                        <ui:Button
+                            MinHeight="38"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Stretch"
+                            Appearance="Secondary"
+                            Command="{Binding ToggleStatusCommand}"
+                            Content="{Binding StatusActionText}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border
+                Grid.ColumnSpan="3"
+                Panel.ZIndex="20"
+                Background="#66000000"
+                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ui:ProgressRing IsIndeterminate="True" />
+                    <TextBlock Margin="0,10,0,0" Foreground="White" Text="{Binding BusyMessage}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>

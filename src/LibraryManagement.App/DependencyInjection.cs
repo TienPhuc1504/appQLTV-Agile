@@ -28,9 +28,15 @@ public static class DependencyInjection
         services.AddSingleton<MainViewModel>();
         services.AddTransient<LoginViewModel>();
         services.AddTransient<FoundationViewModel>();
+        services.AddTransient<CategoryViewModel>();
+        services.AddTransient<AuthorViewModel>();
+        services.AddTransient<PublisherViewModel>();
 
         services.AddTransient<LoginView>();
         services.AddTransient<FoundationPage>();
+        services.AddTransient<CategoryPage>();
+        services.AddTransient<AuthorPage>();
+        services.AddTransient<PublisherPage>();
         services.AddTransient<MainWindow>();
 
         return services;

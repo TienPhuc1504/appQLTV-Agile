@@ -25,6 +25,15 @@
                     Content="Nền tảng ứng dụng"
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:FoundationPage}" />
+                <ui:NavigationViewItem
+                    Content="Thể loại"
+                    TargetPageType="{x:Type pages:CategoryPage}" />
+                <ui:NavigationViewItem
+                    Content="Tác giả"
+                    TargetPageType="{x:Type pages:AuthorPage}" />
+                <ui:NavigationViewItem
+                    Content="Nhà xuất bản"
+                    TargetPageType="{x:Type pages:PublisherPage}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem

@@ -1,5 +1,6 @@
 using LibraryManagement.Infrastructure.Data;
 using LibraryManagement.Infrastructure.Initialization;
+using LibraryManagement.Infrastructure.Repositories;
 using LibraryManagement.Infrastructure.Services;
 using LibraryManagement.Core.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,12 @@ public static class DependencyInjection
                 serviceProvider.GetRequiredService<
                     Microsoft.Extensions.Logging.ILogger<JsonLoginPreferenceService>>()));
         services.AddSingleton<IAuthenticationService, AuthenticationService>();
+        services.AddSingleton<ICategoryRepository, CategoryRepository>();
+        services.AddSingleton<IAuthorRepository, AuthorRepository>();
+        services.AddSingleton<IPublisherRepository, PublisherRepository>();
+        services.AddSingleton<ICategoryService, CategoryService>();
+        services.AddSingleton<IAuthorService, AuthorService>();
+        services.AddSingleton<IPublisherService, PublisherService>();
 
         return services;
     }

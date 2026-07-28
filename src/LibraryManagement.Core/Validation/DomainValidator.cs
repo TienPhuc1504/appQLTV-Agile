@@ -49,6 +49,71 @@ public static partial class DomainValidator
         return normalizedValue;
     }
 
+    public static string? Optional(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    public static string MaximumLength(
+        string value,
+        int maximumLength,
+        string fieldDisplayName)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maximumLength);
+
+        if (value.Length > maximumLength)
+        {
+            throw new DomainValidationException(
+                $"{fieldDisplayName} không được vượt quá {maximumLength} ký tự.");
+        }
+
+        return value;
+    }
+
+    public static string? OptionalMaximumLength(
+        string? value,
+        int maximumLength,
+        string fieldDisplayName)
+    {
+        string? normalizedValue = Optional(value);
+        return normalizedValue is null
+            ? null
+            : MaximumLength(normalizedValue, maximumLength, fieldDisplayName);
+    }
+
+    public static string? OptionalWebsite(string? value)
+    {
+        string? normalizedValue = Optional(value);
+        if (normalizedValue is null)
+        {
+            return null;
+        }
+
+        if (!Uri.TryCreate(normalizedValue, UriKind.Absolute, out Uri? uri)
+            || (uri.Scheme != Uri.UriSchemeHttp
+                && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new DomainValidationException(
+                "Website phải là địa chỉ HTTP hoặc HTTPS hợp lệ.");
+        }
+
+        return normalizedValue;
+    }
+
+    public static DateOnly? NotInFuture(
+        DateOnly? value,
+        string fieldDisplayName,
+        DateOnly today)
+    {
+        if (value > today)
+        {
+            throw new DomainValidationException(
+                $"{fieldDisplayName} không được lớn hơn ngày hiện tại.");
+        }
+
+        return value;
+    }
+
     public static decimal NonNegative(decimal value, string fieldDisplayName)
     {
         if (value < 0)
