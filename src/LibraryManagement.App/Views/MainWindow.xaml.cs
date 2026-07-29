@@ -32,7 +32,7 @@ public partial class MainWindow : FluentWindow
 
     private void OnLoaded(object sender, System.Windows.RoutedEventArgs e)
     {
-        _navigationService.Navigate<FoundationPage>();
+        _navigationService.Navigate<DashboardPage>();
     }
 
     private void OnClosed(object? sender, EventArgs e)

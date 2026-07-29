@@ -239,7 +239,11 @@ public sealed class CatalogServiceTests
                             $"Data Source={databasePath};Foreign Keys=True",
                         ["Security:BCryptWorkFactor"] = "4",
                         ["Storage:LoginPreferencesFile"] =
-                            Path.ChangeExtension(databasePath, ".json")
+                            Path.ChangeExtension(databasePath, ".json"),
+                        ["Storage:BookCoversDirectory"] =
+                            Path.Combine(
+                                Path.GetDirectoryName(databasePath)!,
+                                "BookCovers")
                     })
                 .Build();
 

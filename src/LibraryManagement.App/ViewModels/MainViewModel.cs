@@ -37,7 +37,7 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
         _themeService.ThemeChanged += OnThemeChanged;
     }
 
-    public string ApplicationName => "LibraryManagement";
+    public string ApplicationName => "Quản lý thư viện";
 
     public string CurrentEmployeeName =>
         _currentUserService.CurrentUser?.FullName ?? "Chưa đăng nhập";
@@ -52,6 +52,12 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
 
     public bool CanManageSystemSettings =>
         _authenticationService.CheckPermission(Permission.ManageSystemSettings);
+
+    public bool CanManageEmployees =>
+        _authenticationService.CheckPermission(Permission.ManageEmployees);
+
+    public bool CanViewActivityLogs =>
+        _authenticationService.CheckPermission(Permission.ViewActivityLogs);
 
     [RelayCommand]
     private void ToggleTheme()
@@ -108,6 +114,8 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
         OnPropertyChanged(nameof(CurrentEmployeeName));
         OnPropertyChanged(nameof(CurrentEmployeeRole));
         OnPropertyChanged(nameof(CanManageSystemSettings));
+        OnPropertyChanged(nameof(CanManageEmployees));
+        OnPropertyChanged(nameof(CanViewActivityLogs));
     }
 
     private void OnThemeChanged(object? sender, EventArgs e)

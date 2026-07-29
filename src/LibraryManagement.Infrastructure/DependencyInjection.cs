@@ -28,6 +28,7 @@ public static class DependencyInjection
             options
                 .UseSqlite(connectionString)
                 .EnableDetailedErrors());
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IPasswordHasher>(
@@ -44,6 +45,37 @@ public static class DependencyInjection
         services.AddSingleton<ICategoryService, CategoryService>();
         services.AddSingleton<IAuthorService, AuthorService>();
         services.AddSingleton<IPublisherService, PublisherService>();
+        services.AddSingleton<IBookRepository, BookRepository>();
+        services.AddSingleton<IBookCopyRepository, BookCopyRepository>();
+        services.AddSingleton<IBookCoverStorageService>(
+            _ => new BookCoverStorageService(
+                GetBookCoversDirectory(configuration)));
+        services.AddSingleton<IBookService, BookService>();
+        services.AddSingleton<IBookCopyService, BookCopyService>();
+        services.AddSingleton<IReaderRepository, ReaderRepository>();
+        services.AddSingleton<IReaderService, ReaderService>();
+        services.AddSingleton<IBorrowRepository, BorrowRepository>();
+        services.AddSingleton<IBorrowService, BorrowService>();
+        services.AddSingleton<IReturnRepository, ReturnRepository>();
+        services.AddSingleton<IReturnService, ReturnService>();
+        services.AddSingleton<IFineRepository, FineRepository>();
+        services.AddSingleton<IFineService, FineService>();
+        services.AddSingleton<IDashboardRepository, DashboardRepository>();
+        services.AddSingleton<IDashboardService, DashboardService>();
+        services.AddSingleton<IEmployeeRepository, EmployeeRepository>();
+        services.AddSingleton<IEmployeeService, EmployeeService>();
+        services.AddSingleton<ISystemSettingRepository, SystemSettingRepository>();
+        services.AddSingleton<ISystemSettingService, SystemSettingService>();
+        services.AddSingleton<IActivityLogRepository, ActivityLogRepository>();
+        services.AddSingleton<IActivityLogService, ActivityLogService>();
+        services.AddSingleton<IDatabaseBackupService>(
+            serviceProvider => new DatabaseBackupService(
+                connectionString,
+                serviceProvider.GetRequiredService<IAuthenticationService>(),
+                serviceProvider.GetRequiredService<IActivityLogService>(),
+                serviceProvider.GetRequiredService<TimeProvider>(),
+                serviceProvider.GetRequiredService<
+                    Microsoft.Extensions.Logging.ILogger<DatabaseBackupService>>()));
 
         return services;
     }
@@ -69,6 +101,15 @@ public static class DependencyInjection
         string configuredPath = configuration["Storage:LoginPreferencesFile"]
             ?? throw new InvalidOperationException(
                 "Không tìm thấy cấu hình 'Storage:LoginPreferencesFile'.");
+
+        return Environment.ExpandEnvironmentVariables(configuredPath);
+    }
+
+    private static string GetBookCoversDirectory(IConfiguration configuration)
+    {
+        string configuredPath = configuration["Storage:BookCoversDirectory"]
+            ?? throw new InvalidOperationException(
+                "Không tìm thấy cấu hình 'Storage:BookCoversDirectory'.");
 
         return Environment.ExpandEnvironmentVariables(configuredPath);
     }

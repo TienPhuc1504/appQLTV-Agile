@@ -2003,6 +2003,15 @@ namespace LibraryManagement.Infrastructure.Data.Migrations
                             UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             UpdatedByEmployeeId = 1,
                             Value = "12"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Tiền phạt chưa thanh toán tối đa vẫn được phép mượn",
+                            Key = "MaximumOutstandingFineAmount",
+                            UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            UpdatedByEmployeeId = 1,
+                            Value = "0"
                         });
                 });
 

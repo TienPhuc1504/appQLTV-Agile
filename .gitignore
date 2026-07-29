@@ -23,3 +23,10 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 [Dd]s_[St]ore
+
+# Build artifacts and local runtime data
+artifacts/
+*.db
+*.db-shm
+*.db-wal
+*.log

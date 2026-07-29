@@ -1,3 +1,4 @@
+using LibraryManagement.Core.Constants;
 using LibraryManagement.Core.Entities;
 using LibraryManagement.Core.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -346,14 +347,51 @@ internal static class SeedData
     private static void SeedSystemSettings(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<SystemSetting>().HasData(
-            CreateSetting(1, "MaximumBorrowedBooks", "5", "Số bản sách được mượn tối đa"),
-            CreateSetting(2, "DefaultBorrowDays", "14", "Số ngày mượn mặc định"),
-            CreateSetting(3, "MaximumRenewalCount", "2", "Số lần gia hạn tối đa"),
-            CreateSetting(4, "RenewalDays", "7", "Số ngày cho mỗi lần gia hạn"),
-            CreateSetting(5, "OverdueFinePerDay", "5000", "Mức phạt quá hạn mỗi ngày"),
-            CreateSetting(6, "LostBookFineMultiplier", "2.0", "Hệ số phạt mất sách"),
-            CreateSetting(7, "DamagedBookFineMultiplier", "0.5", "Hệ số phạt hư hỏng"),
-            CreateSetting(8, "ReaderCardValidityMonths", "12", "Thời hạn thẻ độc giả theo tháng"));
+            CreateSetting(
+                1,
+                SystemSettingKeys.MaximumBorrowedBooks,
+                "5",
+                "Số bản sách được mượn tối đa"),
+            CreateSetting(
+                2,
+                SystemSettingKeys.DefaultBorrowDays,
+                "14",
+                "Số ngày mượn mặc định"),
+            CreateSetting(
+                3,
+                SystemSettingKeys.MaximumRenewalCount,
+                "2",
+                "Số lần gia hạn tối đa"),
+            CreateSetting(
+                4,
+                SystemSettingKeys.RenewalDays,
+                "7",
+                "Số ngày cho mỗi lần gia hạn"),
+            CreateSetting(
+                5,
+                SystemSettingKeys.OverdueFinePerDay,
+                "5000",
+                "Mức phạt quá hạn mỗi ngày"),
+            CreateSetting(
+                6,
+                SystemSettingKeys.LostBookFineMultiplier,
+                "2.0",
+                "Hệ số phạt mất sách"),
+            CreateSetting(
+                7,
+                SystemSettingKeys.DamagedBookFineMultiplier,
+                "0.5",
+                "Hệ số phạt hư hỏng"),
+            CreateSetting(
+                8,
+                SystemSettingKeys.ReaderCardValidityMonths,
+                "12",
+                "Thời hạn thẻ độc giả theo tháng"),
+            CreateSetting(
+                9,
+                SystemSettingKeys.MaximumOutstandingFineAmount,
+                "0",
+                "Tiền phạt chưa thanh toán tối đa vẫn được phép mượn"));
     }
 
     private static void SeedActivityLogs(ModelBuilder modelBuilder)

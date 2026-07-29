@@ -1,0 +1,341 @@
+<Page
+    x:Class="LibraryManagement.App.Views.Pages.BorrowPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Mượn sách"
+    Loaded="OnLoaded"
+    mc:Ignorable="d">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <TextBlock
+                FontSize="28"
+                FontWeight="SemiBold"
+                Text="Lập phiếu mượn" />
+            <Border
+                Padding="14,8"
+                HorizontalAlignment="Right"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock
+                        FontWeight="SemiBold"
+                        Text="{Binding MaximumBorrowedBooks, StringFormat=Tối đa {0} bản}" />
+                    <TextBlock Margin="14,0" Text="•" />
+                    <TextBlock Text="{Binding DefaultBorrowDays, StringFormat={}{0} ngày mượn}" />
+                    <TextBlock Margin="14,0" Text="•" />
+                    <TextBlock
+                        Text="{Binding MaximumOutstandingFineAmount, StringFormat=Ngưỡng phạt {0:N0} đ}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="0,18,0,0"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto">
+            <Grid MinWidth="860">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="24" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Padding="18"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="220" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="1. Chọn độc giả" />
+                        <Grid Grid.Row="1" Margin="0,14,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                MaxLength="150"
+                                PlaceholderText="Nhập mã hoặc tên độc giả..."
+                                Text="{Binding ReaderSearchText, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="8,0,0,0"
+                                Command="{Binding SearchReaderCommand}"
+                                Content="Tìm độc giả" />
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <DataGrid
+                                x:Name="ReaderResultGrid"
+                                AutomationProperties.Name="Kết quả tìm độc giả"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding ReaderResults}"
+                                SelectedItem="{Binding SelectedReader}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="90"
+                                        Binding="{Binding ReaderCode}"
+                                        Header="Mã" />
+                                    <DataGridTextColumn
+                                        Width="2*"
+                                        Binding="{Binding FullName}"
+                                        Header="Họ tên" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Status, Converter={StaticResource ReaderStatusConverter}}"
+                                        Header="Trạng thái" />
+                                    <DataGridTextColumn
+                                        Width="110"
+                                        Binding="{Binding ExpirationDate}"
+                                        Header="Hết hạn" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Chưa có kết quả tìm kiếm.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding HasItems, ElementName=ReaderResultGrid}"
+                                                Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Border
+                            Grid.Row="3"
+                            Margin="0,12,0,0"
+                            Padding="12"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Text="{Binding SelectedReader.FullName, TargetNullValue=Chưa chọn độc giả}" />
+                                    <TextBlock
+                                        Margin="0,4,0,0"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        Text="{Binding EligibilityMessage}"
+                                        TextWrapping="Wrap" />
+                                </StackPanel>
+                                <ui:Button
+                                    Grid.Column="1"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding CheckReaderEligibilityCommand}"
+                                    Content="Kiểm tra điều kiện" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Grid.Column="2"
+                    Padding="18"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="2. Thêm bản sách" />
+                        <Grid Grid.Row="1" Margin="0,14,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox
+                                MaxLength="30"
+                                PlaceholderText="Nhập hoặc quét mã bản sách..."
+                                Text="{Binding CopyCode, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button
+                                Grid.Column="1"
+                                Margin="8,0,0,0"
+                                Appearance="Primary"
+                                Command="{Binding AddCopyCommand}"
+                                Content="Thêm" />
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <DataGrid
+                                x:Name="SelectedCopyGrid"
+                                MinHeight="250"
+                                AutomationProperties.Name="Danh sách bản sách mượn"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding SelectedCopies}"
+                                SelectedItem="{Binding SelectedCartCopy}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="100"
+                                        Binding="{Binding CopyCode}"
+                                        Header="Mã bản" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding BookCode}"
+                                        Header="Mã sách" />
+                                    <DataGridTextColumn
+                                        Width="2*"
+                                        Binding="{Binding BookTitle}"
+                                        Header="Tên sách" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding ShelfLocation}"
+                                        Header="Vị trí kệ" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Chưa thêm bản sách nào.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding HasItems, ElementName=SelectedCopyGrid}"
+                                                Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="{Binding SelectedCopySummary}" />
+                            <ui:Button
+                                HorizontalAlignment="Right"
+                                Appearance="Danger"
+                                Command="{Binding RemoveCopyCommand}"
+                                Content="Bỏ bản đã chọn" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    Margin="0,20,0,0"
+                    Padding="18"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock
+                                FontWeight="SemiBold"
+                                Text="Ngày mượn" />
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                FontSize="16"
+                                Text="{Binding BorrowDate, StringFormat={}{0:dd/MM/yyyy}}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock
+                                FontWeight="SemiBold"
+                                Text="Ngày hẹn trả" />
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                FontSize="16"
+                                Text="{Binding ExpectedReturnDate, StringFormat={}{0:dd/MM/yyyy}}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="4">
+                            <TextBlock
+                                FontWeight="SemiBold"
+                                Text="Ghi chú" />
+                            <ui:TextBox
+                                MinHeight="56"
+                                Margin="0,6,0,0"
+                                AcceptsReturn="True"
+                                MaxLength="1000"
+                                Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding ErrorMessage}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                        <ui:Button
+                            Grid.Column="6"
+                            MinWidth="150"
+                            MinHeight="44"
+                            VerticalAlignment="Center"
+                            Appearance="Primary"
+                            AutomationProperties.Name="Xác nhận lập phiếu"
+                            Command="{Binding ConfirmBorrowCommand}"
+                            Content="Xác nhận lập phiếu" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+        <Border
+            Grid.RowSpan="2"
+            Panel.ZIndex="50"
+            Background="#66000000"
+            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock
+                    Margin="0,10,0,0"
+                    Foreground="White"
+                    Text="{Binding BusyMessage}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

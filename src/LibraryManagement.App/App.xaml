@@ -6,12 +6,26 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+            <converters:BookCopyStatusConverter x:Key="BookCopyStatusConverter" />
+            <converters:BorrowSlipDetailStatusConverter x:Key="BorrowSlipDetailStatusConverter" />
+            <converters:FineStatusConverter x:Key="FineStatusConverter" />
+            <converters:FineTypeConverter x:Key="FineTypeConverter" />
+            <converters:GenderConverter x:Key="GenderConverter" />
+            <converters:PhysicalConditionConverter x:Key="PhysicalConditionConverter" />
+            <converters:PaymentMethodConverter x:Key="PaymentMethodConverter" />
+            <converters:ReaderStatusConverter x:Key="ReaderStatusConverter" />
+            <converters:ReaderTypeConverter x:Key="ReaderTypeConverter" />
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter
+                    Property="Foreground"
+                    Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

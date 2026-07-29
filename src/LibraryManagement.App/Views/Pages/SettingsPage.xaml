@@ -1,0 +1,105 @@
+<Page
+    x:Class="LibraryManagement.App.Views.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Cài đặt"
+    Loaded="OnLoaded">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <TextBlock FontSize="28" FontWeight="SemiBold" Text="Cài đặt hệ thống" />
+            <TextBlock
+                Margin="0,6,0,0"
+                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                Text="Các giá trị nghiệp vụ được lưu trong database và áp dụng cho toàn hệ thống." />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+            <DataGrid
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True"
+                ItemsSource="{Binding Settings}"
+                SelectedItem="{Binding SelectedSetting}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="220" Binding="{Binding Key}" Header="Cài đặt" />
+                    <DataGridTextColumn Width="100" Binding="{Binding Value}" Header="Giá trị" />
+                    <DataGridTextColumn Width="*" Binding="{Binding Description}" Header="Mô tả" />
+                    <DataGridTextColumn Width="150" Binding="{Binding UpdatedByEmployeeName}" Header="Người cập nhật" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <Border
+                Grid.Column="2"
+                Padding="20"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="10">
+                <StackPanel>
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="Cập nhật giá trị" />
+                    <TextBlock Margin="0,14,0,4" Text="{Binding SelectedSetting.Key, TargetNullValue=Chưa chọn cài đặt}" />
+                    <TextBlock
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="{Binding SelectedSetting.Description}"
+                        TextWrapping="Wrap" />
+                    <TextBlock Margin="0,16,0,4" Text="Giá trị mới *" />
+                    <ui:TextBox
+                        AutomationProperties.Name="Giá trị cài đặt"
+                        MaxLength="500"
+                        Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock
+                        Margin="0,10,0,0"
+                        Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                        Text="{Binding ErrorMessage}"
+                        TextWrapping="Wrap"
+                        Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <ui:Button
+                        Margin="0,18,0,0"
+                        HorizontalAlignment="Left"
+                        Appearance="Primary"
+                        Command="{Binding SaveCommand}"
+                        Content="Lưu cài đặt" />
+                    <Separator Margin="0,24,0,20" />
+                    <TextBlock
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="Sao lưu và phục hồi" />
+                    <TextBlock
+                        Margin="0,6,0,0"
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Text="Tạo bản sao hoặc phục hồi toàn bộ dữ liệu thư viện."
+                        TextWrapping="Wrap" />
+                    <WrapPanel Margin="0,16,0,0">
+                        <ui:Button
+                            Margin="0,0,8,8"
+                            Command="{Binding BackupDatabaseCommand}"
+                            Content="Sao lưu database"
+                            Icon="{ui:SymbolIcon DatabaseArrowUp20}" />
+                        <ui:Button
+                            Margin="0,0,0,8"
+                            Appearance="Caution"
+                            Command="{Binding RestoreDatabaseCommand}"
+                            Content="Phục hồi database"
+                            Icon="{ui:SymbolIcon DatabaseArrowDown20}" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <Border
+            Grid.RowSpan="2"
+            Panel.ZIndex="10"
+            Background="#66000000"
+            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock Margin="0,10,0,0" Foreground="White" Text="{Binding BusyMessage}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

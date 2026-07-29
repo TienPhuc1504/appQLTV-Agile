@@ -1,0 +1,230 @@
+<Page
+    x:Class="LibraryManagement.App.Views.Pages.BookCopyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Quản lý bản sách"
+    Loaded="OnLoaded"
+    mc:Ignorable="d">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock FontSize="28" FontWeight="SemiBold" Text="Quản lý bản sách" />
+
+        <TabControl
+            Grid.Row="1"
+            Margin="0,18,0,0"
+            SelectedIndex="{Binding SelectedTabIndex}">
+            <TabItem Header="Danh sách bản sách">
+                <Grid Margin="12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox
+                            PlaceholderText="Mã bản sách, tên sách hoặc vị trí kệ..."
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        <ComboBox
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            DisplayMemberPath="Name"
+                            ItemsSource="{Binding Books}"
+                            SelectedItem="{Binding BookFilter}" />
+                        <ComboBox
+                            Grid.Column="2"
+                            Margin="10,0,0,0"
+                            DisplayMemberPath="DisplayName"
+                            ItemsSource="{Binding Statuses}"
+                            SelectedItem="{Binding StatusFilter}" />
+                        <ui:Button
+                            Grid.Column="3"
+                            Margin="10,0,0,0"
+                            Command="{Binding SearchCommand}"
+                            Content="Tìm kiếm" />
+                    </Grid>
+
+                    <Grid Grid.Row="1" Margin="0,12,0,0">
+                        <DataGrid
+                            x:Name="CopyGrid"
+                            AutoGenerateColumns="False"
+                            CanUserAddRows="False"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding Copies}"
+                            SelectedItem="{Binding SelectedCopy}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="110" Binding="{Binding CopyCode}" Header="Mã bản" />
+                                <DataGridTextColumn Width="100" Binding="{Binding BookCode}" Header="Mã sách" />
+                                <DataGridTextColumn Width="2*" Binding="{Binding BookTitle}" Header="Tên sách" />
+                                <DataGridTextColumn Width="*" Binding="{Binding ShelfLocation}" Header="Vị trí kệ" />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding PhysicalCondition, Converter={StaticResource PhysicalConditionConverter}}"
+                                    Header="Tình trạng" />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding Status, Converter={StaticResource BookCopyStatusConverter}}"
+                                    Header="Trạng thái" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Không có bản sách phù hợp.">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasItems, ElementName=CopyGrid}" Value="False">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="0,12,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Appearance="Primary" Command="{Binding NewCommand}" Content="Thêm bản sách" />
+                            <ui:Button Margin="8,0,0,0" Command="{Binding EditCommand}" Content="Sửa" />
+                            <ui:Button
+                                Margin="8,0,0,0"
+                                Command="{Binding ViewHistoryCommand}"
+                                Content="Lịch sử mượn" />
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <ui:Button Command="{Binding PreviousPageCommand}" Content="Trước" />
+                            <TextBlock Margin="12,0" VerticalAlignment="Center" Text="{Binding PageSummary}" />
+                            <ui:Button Command="{Binding NextPageCommand}" Content="Sau" />
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="{Binding TotalCount, StringFormat=Tổng: {0}}" />
+                            <ComboBox Width="70" ItemsSource="{Binding PageSizes}" SelectedItem="{Binding PageSize}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Thêm / cập nhật">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20" MaxWidth="760">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="24" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock FontWeight="SemiBold" Text="Mã bản sách *" />
+                            <ui:TextBox
+                                x:Name="CopyCodeInput"
+                                Margin="0,6,0,0"
+                                IsEnabled="{Binding CanEditIdentity}"
+                                MaxLength="30"
+                                Text="{Binding CopyCode, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=CopyCodeInput}"
+                                Visibility="{Binding (Validation.HasError), ElementName=CopyCodeInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <TextBlock Margin="0,12,0,0" FontWeight="SemiBold" Text="Sách *" />
+                            <ComboBox
+                                Margin="0,6,0,0"
+                                DisplayMemberPath="Name"
+                                IsEnabled="{Binding CanEditIdentity}"
+                                ItemsSource="{Binding Books}"
+                                SelectedItem="{Binding SelectedBook, ValidatesOnNotifyDataErrors=True}" />
+                            <TextBlock Margin="0,12,0,0" FontWeight="SemiBold" Text="Vị trí kệ" />
+                            <ui:TextBox Margin="0,6,0,0" MaxLength="100" Text="{Binding ShelfLocation}" />
+                            <TextBlock Margin="0,12,0,0" FontWeight="SemiBold" Text="Ngày nhập" />
+                            <DatePicker
+                                Margin="0,6,0,0"
+                                SelectedDate="{Binding ImportedAt, ValidatesOnNotifyDataErrors=True}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock FontWeight="SemiBold" Text="Tình trạng vật lý" />
+                            <ComboBox
+                                Margin="0,6,0,0"
+                                DisplayMemberPath="DisplayName"
+                                ItemsSource="{Binding PhysicalConditions}"
+                                SelectedItem="{Binding SelectedPhysicalCondition}" />
+                            <TextBlock Margin="0,12,0,0" FontWeight="SemiBold" Text="Trạng thái" />
+                            <ComboBox
+                                Margin="0,6,0,0"
+                                DisplayMemberPath="DisplayName"
+                                ItemsSource="{Binding Statuses}"
+                                SelectedItem="{Binding SelectedStatus}" />
+                            <TextBlock Margin="0,12,0,0" FontWeight="SemiBold" Text="Ghi chú" />
+                            <ui:TextBox
+                                MinHeight="100"
+                                Margin="0,6,0,0"
+                                AcceptsReturn="True"
+                                MaxLength="1000"
+                                Text="{Binding Notes}"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Margin="0,10,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding ErrorMessage}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <ui:Button
+                                MinHeight="42"
+                                Margin="0,16,0,0"
+                                Appearance="Primary"
+                                Command="{Binding SaveCommand}"
+                                Content="Lưu bản sách" />
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Lịch sử mượn">
+                <Grid Margin="12">
+                    <DataGrid
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding BorrowHistory}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="130" Binding="{Binding BorrowCode}" Header="Mã phiếu" />
+                            <DataGridTextColumn Width="100" Binding="{Binding ReaderCode}" Header="Mã độc giả" />
+                            <DataGridTextColumn Width="2*" Binding="{Binding ReaderName}" Header="Tên độc giả" />
+                            <DataGridTextColumn Width="110" Binding="{Binding BorrowDate}" Header="Ngày mượn" />
+                            <DataGridTextColumn Width="110" Binding="{Binding ExpectedReturnDate}" Header="Hẹn trả" />
+                            <DataGridTextColumn Width="110" Binding="{Binding ActualReturnDate}" Header="Ngày trả" />
+                            <DataGridTextColumn Width="100" Binding="{Binding RenewalCount}" Header="Gia hạn" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Status, Converter={StaticResource BorrowSlipDetailStatusConverter}}"
+                                Header="Trạng thái" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Border
+            Grid.RowSpan="2"
+            Panel.ZIndex="50"
+            Background="#66000000"
+            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock Margin="0,10,0,0" Foreground="White" Text="{Binding BusyMessage}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

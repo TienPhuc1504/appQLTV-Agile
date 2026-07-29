@@ -1,0 +1,645 @@
+<Page
+    x:Class="LibraryManagement.App.Views.Pages.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Tổng quan"
+    Loaded="OnLoaded"
+    d:DesignHeight="900"
+    d:DesignWidth="1200"
+    mc:Ignorable="d">
+    <Grid>
+        <ScrollViewer
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="28">
+                <Grid>
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="28"
+                            FontWeight="SemiBold"
+                            Text="Tổng quan thư viện" />
+                        <TextBlock
+                            Margin="0,6,0,0"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Số liệu vận hành, xu hướng mượn sách và báo cáo hiện tại." />
+                    </StackPanel>
+                    <ui:Button
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="Làm mới tổng quan"
+                        Command="{Binding LoadCommand}"
+                        Content="Làm mới"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}" />
+                </Grid>
+
+                <WrapPanel Margin="0,22,0,0">
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Tổng số đầu sách" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.TotalBooks}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Tổng số bản sách" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.TotalBookCopies}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Bản sách có sẵn" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                Text="{Binding Summary.AvailableBookCopies}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Sách đang mượn" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.BorrowedBookCopies}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Sách quá hạn" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding Summary.OverdueBookCopies}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Độc giả hoạt động" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.ActiveReaders}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Lượt mượn hôm nay" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.TodayBorrowedBooks}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="210"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Lượt trả hôm nay" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding Summary.TodayReturnedBooks}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Width="250"
+                        Margin="0,0,12,12"
+                        Padding="18"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Tiền phạt chưa thu" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                                Text="{Binding Summary.OutstandingFineAmount, StringFormat={}{0:N0} ₫}" />
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+
+                <Border
+                    Margin="0,0,0,10"
+                    Padding="12"
+                    Background="{DynamicResource SystemFillColorCriticalBackgroundBrush}"
+                    CornerRadius="8"
+                    Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+                        AutomationProperties.Name="Lỗi Dashboard"
+                        Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                        Text="{Binding ErrorMessage}"
+                        TextWrapping="Wrap" />
+                </Border>
+
+                <Border
+                    Margin="0,10,0,0"
+                    Padding="20"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="Lượt mượn theo tháng" />
+                        <TextBlock
+                            Margin="0,4,0,16"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Thống kê số bản sách được mượn trong 12 tháng gần nhất." />
+                        <ItemsControl ItemsSource="{Binding MonthlyBorrowStatistics}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="50" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding MonthLabel}" />
+                                        <ProgressBar
+                                            Grid.Column="1"
+                                            Height="16"
+                                            Margin="8,0"
+                                            Maximum="{Binding DataContext.MaxMonthlyBorrowCount, RelativeSource={RelativeSource AncestorType=Page}}"
+                                            Value="{Binding BorrowCount}" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding BorrowCount}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Grid Margin="0,18,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        Padding="20"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Text="Sách được mượn nhiều" />
+                            <DataGrid
+                                Margin="0,12,0,0"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                HeadersVisibility="Column"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding MostBorrowedBooks}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="90"
+                                        Binding="{Binding BookCode}"
+                                        Header="Mã sách" />
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding Title}"
+                                        Header="Tên sách" />
+                                    <DataGridTextColumn
+                                        Width="70"
+                                        Binding="{Binding BorrowCount}"
+                                        Header="Lượt" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                HorizontalAlignment="Center"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Chưa có dữ liệu mượn sách."
+                                Visibility="{Binding HasNoMostBorrowedBooks, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Grid.Column="2"
+                        Padding="20"
+                        Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="10">
+                        <StackPanel>
+                            <TextBlock
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Text="Thể loại được mượn nhiều" />
+                            <DataGrid
+                                Margin="0,12,0,0"
+                                AutoGenerateColumns="False"
+                                CanUserAddRows="False"
+                                HeadersVisibility="Column"
+                                IsReadOnly="True"
+                                ItemsSource="{Binding MostBorrowedCategories}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn
+                                        Width="*"
+                                        Binding="{Binding CategoryName}"
+                                        Header="Thể loại" />
+                                    <DataGridTextColumn
+                                        Width="70"
+                                        Binding="{Binding BorrowCount}"
+                                        Header="Lượt" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                HorizontalAlignment="Center"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="Chưa có dữ liệu thể loại."
+                                Visibility="{Binding HasNoMostBorrowedCategories, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Border
+                    Margin="0,18,0,0"
+                    Padding="20"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="Báo cáo vận hành" />
+                        <TabControl Margin="0,12,0,0">
+                            <TabItem Header="Sách đang mượn">
+                                <Grid MinHeight="220">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid
+                                        AutoGenerateColumns="False"
+                                        CanUserAddRows="False"
+                                        IsReadOnly="True"
+                                        ItemsSource="{Binding BorrowedBooks}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Width="115"
+                                                Binding="{Binding BorrowCode}"
+                                                Header="Phiếu mượn" />
+                                            <DataGridTextColumn
+                                                Width="100"
+                                                Binding="{Binding ReaderCode}"
+                                                Header="Mã độc giả" />
+                                            <DataGridTextColumn
+                                                Width="160"
+                                                Binding="{Binding ReaderName}"
+                                                Header="Độc giả" />
+                                            <DataGridTextColumn
+                                                Width="105"
+                                                Binding="{Binding CopyCode}"
+                                                Header="Mã bản sách" />
+                                            <DataGridTextColumn
+                                                Width="*"
+                                                Binding="{Binding BookTitle}"
+                                                Header="Tên sách" />
+                                            <DataGridTextColumn
+                                                Width="105"
+                                                Binding="{Binding BorrowDate, StringFormat=dd/MM/yyyy}"
+                                                Header="Ngày mượn" />
+                                            <DataGridTextColumn
+                                                Width="105"
+                                                Binding="{Binding ExpectedReturnDate, StringFormat=dd/MM/yyyy}"
+                                                Header="Hẹn trả" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        Text="Không có sách đang mượn."
+                                        Visibility="{Binding HasNoBorrowedBooks, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Margin="0,10,0,0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <ui:Button
+                                            AutomationProperties.Name="Trang trước báo cáo sách đang mượn"
+                                            Command="{Binding PreviousBorrowedPageCommand}"
+                                            Content="Trước" />
+                                        <TextBlock
+                                            Margin="14,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding BorrowedPageNumber, StringFormat=Trang {0}}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding BorrowedTotalPages, StringFormat=/ {0}}" />
+                                        <ui:Button
+                                            Margin="14,0,0,0"
+                                            AutomationProperties.Name="Trang sau báo cáo sách đang mượn"
+                                            Command="{Binding NextBorrowedPageCommand}"
+                                            Content="Sau" />
+                                        <TextBlock
+                                            Margin="16,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{Binding BorrowedTotalCount, StringFormat=Tổng: {0}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Sách quá hạn">
+                                <Grid MinHeight="220">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid
+                                        AutoGenerateColumns="False"
+                                        CanUserAddRows="False"
+                                        IsReadOnly="True"
+                                        ItemsSource="{Binding OverdueBooks}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Width="115"
+                                                Binding="{Binding BorrowCode}"
+                                                Header="Phiếu mượn" />
+                                            <DataGridTextColumn
+                                                Width="100"
+                                                Binding="{Binding ReaderCode}"
+                                                Header="Mã độc giả" />
+                                            <DataGridTextColumn
+                                                Width="160"
+                                                Binding="{Binding ReaderName}"
+                                                Header="Độc giả" />
+                                            <DataGridTextColumn
+                                                Width="105"
+                                                Binding="{Binding CopyCode}"
+                                                Header="Mã bản sách" />
+                                            <DataGridTextColumn
+                                                Width="*"
+                                                Binding="{Binding BookTitle}"
+                                                Header="Tên sách" />
+                                            <DataGridTextColumn
+                                                Width="105"
+                                                Binding="{Binding ExpectedReturnDate, StringFormat=dd/MM/yyyy}"
+                                                Header="Hẹn trả" />
+                                            <DataGridTextColumn
+                                                Width="90"
+                                                Binding="{Binding OverdueDays}"
+                                                Header="Quá hạn" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        Text="Không có sách quá hạn."
+                                        Visibility="{Binding HasNoOverdueBooks, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Margin="0,10,0,0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <ui:Button
+                                            AutomationProperties.Name="Trang trước báo cáo sách quá hạn"
+                                            Command="{Binding PreviousOverduePageCommand}"
+                                            Content="Trước" />
+                                        <TextBlock
+                                            Margin="14,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding OverduePageNumber, StringFormat=Trang {0}}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding OverdueTotalPages, StringFormat=/ {0}}" />
+                                        <ui:Button
+                                            Margin="14,0,0,0"
+                                            AutomationProperties.Name="Trang sau báo cáo sách quá hạn"
+                                            Command="{Binding NextOverduePageCommand}"
+                                            Content="Sau" />
+                                        <TextBlock
+                                            Margin="16,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{Binding OverdueTotalCount, StringFormat=Tổng: {0}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Tiền phạt chưa thu">
+                                <Grid MinHeight="220">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid
+                                        AutoGenerateColumns="False"
+                                        CanUserAddRows="False"
+                                        IsReadOnly="True"
+                                        ItemsSource="{Binding OutstandingFines}">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Width="115"
+                                                Binding="{Binding FineCode}"
+                                                Header="Mã phạt" />
+                                            <DataGridTextColumn
+                                                Width="100"
+                                                Binding="{Binding ReaderCode}"
+                                                Header="Mã độc giả" />
+                                            <DataGridTextColumn
+                                                Width="160"
+                                                Binding="{Binding ReaderName}"
+                                                Header="Độc giả" />
+                                            <DataGridTextColumn
+                                                Width="110"
+                                                Binding="{Binding FineType, Converter={StaticResource FineTypeConverter}}"
+                                                Header="Loại phạt" />
+                                            <DataGridTextColumn
+                                                Width="120"
+                                                Binding="{Binding Amount, StringFormat={}{0:N0} ₫}"
+                                                Header="Tiền phạt" />
+                                            <DataGridTextColumn
+                                                Width="120"
+                                                Binding="{Binding PaidAmount, StringFormat={}{0:N0} ₫}"
+                                                Header="Đã thu" />
+                                            <DataGridTextColumn
+                                                Width="120"
+                                                Binding="{Binding OutstandingAmount, StringFormat={}{0:N0} ₫}"
+                                                Header="Còn lại" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                        Text="Không có tiền phạt chưa thu."
+                                        Visibility="{Binding HasNoOutstandingFines, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                    <StackPanel
+                                        Grid.Row="1"
+                                        Margin="0,10,0,0"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Horizontal">
+                                        <ui:Button
+                                            AutomationProperties.Name="Trang trước báo cáo tiền phạt"
+                                            Command="{Binding PreviousFinePageCommand}"
+                                            Content="Trước" />
+                                        <TextBlock
+                                            Margin="14,0"
+                                            VerticalAlignment="Center"
+                                            Text="{Binding FinePageNumber, StringFormat=Trang {0}}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="{Binding FineTotalPages, StringFormat=/ {0}}" />
+                                        <ui:Button
+                                            Margin="14,0,0,0"
+                                            AutomationProperties.Name="Trang sau báo cáo tiền phạt"
+                                            Command="{Binding NextFinePageCommand}"
+                                            Content="Sau" />
+                                        <TextBlock
+                                            Margin="16,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{Binding FineTotalCount, StringFormat=Tổng: {0}}" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Margin="0,18,0,28"
+                    Padding="20"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="10"
+                    Visibility="{Binding CanViewRecentActivities, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Text="Hoạt động gần đây" />
+                        <ItemsControl
+                            Margin="0,12,0,0"
+                            ItemsSource="{Binding RecentActivities}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="160" />
+                                            <ColumnDefinition Width="160" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                            Text="{Binding CreatedAt, StringFormat=dd/MM/yyyy HH:mm}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding EmployeeName}" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding Description}"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Chưa có hoạt động gần đây."
+                            Visibility="{Binding HasNoRecentActivities, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border
+            Panel.ZIndex="100"
+            Background="#66000000"
+            Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ui:ProgressRing IsIndeterminate="True" />
+                <TextBlock
+                    Margin="0,12,0,0"
+                    Foreground="White"
+                    Text="{Binding BusyMessage}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

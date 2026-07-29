@@ -9,21 +9,75 @@
     Title="{Binding ApplicationName}"
     Width="1100"
     Height="700"
+    ExtendsContentIntoTitleBar="True"
     MinWidth="800"
     MinHeight="520"
+    ResizeMode="CanResize"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar
+            x:Name="RootTitleBar"
+            Grid.Row="0"
+            CloseWindowByDoubleClickOnIcon="True"
+            Icon="{ui:SymbolIcon Library24}"
+            ShowClose="True"
+            ShowMaximize="True"
+            ShowMinimize="True"
+            Title="{Binding ApplicationName}">
+            <ui:TitleBar.TrailingContent>
+                <Border
+                    Margin="0,0,12,0"
+                    Padding="12,4"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Margin="0,0,12,0" VerticalAlignment="Center">
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                FontWeight="SemiBold"
+                                Text="{Binding CurrentEmployeeName}" />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                FontSize="11"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="{Binding CurrentEmployeeRole}" />
+                        </StackPanel>
+                        <ui:Button
+                            Command="{Binding ToggleThemeCommand}"
+                            Icon="{ui:SymbolIcon WeatherMoon24}"
+                            ToolTip="{Binding ThemeButtonText}" />
+                        <ui:Button
+                            Margin="8,0,0,0"
+                            AutomationProperties.Name="Đăng xuất"
+                            Command="{Binding LogoutCommand}"
+                            Icon="{ui:SymbolIcon SignOut24}"
+                            ToolTip="Đăng xuất" />
+                    </StackPanel>
+                </Border>
+            </ui:TitleBar.TrailingContent>
+        </ui:TitleBar>
+
         <ui:NavigationView
             x:Name="RootNavigation"
+            Grid.Row="1"
             IsBackButtonVisible="Visible"
             IsPaneToggleVisible="True"
             PaneDisplayMode="Left"
             PaneTitle="Thư viện">
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
-                    Content="Nền tảng ứng dụng"
+                    Content="Tổng quan"
                     Icon="{ui:SymbolIcon Home24}"
+                    TargetPageType="{x:Type pages:DashboardPage}" />
+                <ui:NavigationViewItem
+                    Content="Nền tảng ứng dụng"
                     TargetPageType="{x:Type pages:FoundationPage}" />
                 <ui:NavigationViewItem
                     Content="Thể loại"
@@ -34,49 +88,46 @@
                 <ui:NavigationViewItem
                     Content="Nhà xuất bản"
                     TargetPageType="{x:Type pages:PublisherPage}" />
+                <ui:NavigationViewItem
+                    Content="Quản lý sách"
+                    TargetPageType="{x:Type pages:BookPage}" />
+                <ui:NavigationViewItem
+                    Content="Quản lý bản sách"
+                    TargetPageType="{x:Type pages:BookCopyPage}" />
+                <ui:NavigationViewItem
+                    Content="Quản lý độc giả"
+                    Icon="{ui:SymbolIcon PeopleCommunity24}"
+                    TargetPageType="{x:Type pages:ReaderPage}" />
+                <ui:NavigationViewItem
+                    Content="Mượn sách"
+                    TargetPageType="{x:Type pages:BorrowPage}" />
+                <ui:NavigationViewItem
+                    Content="Trả sách"
+                    TargetPageType="{x:Type pages:ReturnPage}" />
+                <ui:NavigationViewItem
+                    Content="Tiền phạt"
+                    TargetPageType="{x:Type pages:FinePage}" />
+                <ui:NavigationViewItem
+                    Content="Nhân viên"
+                    Icon="{ui:SymbolIcon PersonAccounts24}"
+                    TargetPageType="{x:Type pages:EmployeePage}"
+                    Visibility="{Binding CanManageEmployees, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                <ui:NavigationViewItem
+                    Content="Nhật ký hoạt động"
+                    TargetPageType="{x:Type pages:ActivityLogPage}"
+                    Visibility="{Binding CanViewActivityLogs, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </ui:NavigationView.MenuItems>
             <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem
                     Content="Cài đặt"
                     Icon="{ui:SymbolIcon Settings24}"
-                    IsEnabled="False"
+                    TargetPageType="{x:Type pages:SettingsPage}"
                     Visibility="{Binding CanManageSystemSettings, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
 
         <Border
-            Margin="0,0,20,0"
-            Padding="12,6"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-            CornerRadius="8">
-            <StackPanel Orientation="Horizontal">
-                <StackPanel Margin="0,0,12,0">
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        FontWeight="SemiBold"
-                        Text="{Binding CurrentEmployeeName}" />
-                    <TextBlock
-                        HorizontalAlignment="Right"
-                        FontSize="11"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                        Text="{Binding CurrentEmployeeRole}" />
-                </StackPanel>
-                <ui:Button
-                    Command="{Binding ToggleThemeCommand}"
-                    Icon="{ui:SymbolIcon WeatherMoon24}"
-                    ToolTip="{Binding ThemeButtonText}" />
-                <ui:Button
-                    Margin="8,0,0,0"
-                    AutomationProperties.Name="Đăng xuất"
-                    Command="{Binding LogoutCommand}"
-                    Icon="{ui:SymbolIcon SignOut24}"
-                    ToolTip="Đăng xuất" />
-            </StackPanel>
-        </Border>
-
-        <Border
+            Grid.Row="1"
             Panel.ZIndex="100"
             Background="#66000000"
             Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -91,9 +142,11 @@
 
         <ui:SnackbarPresenter
             x:Name="RootSnackbarPresenter"
+            Grid.RowSpan="2"
             Panel.ZIndex="200" />
         <ui:ContentDialogHost
             x:Name="RootContentDialogHost"
+            Grid.RowSpan="2"
             Panel.ZIndex="300" />
     </Grid>
 </ui:FluentWindow>

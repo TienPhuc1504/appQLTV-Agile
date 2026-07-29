@@ -1,4 +1,5 @@
 using FluentAssertions;
+using LibraryManagement.Core.Constants;
 using LibraryManagement.Core.Entities;
 using LibraryManagement.Infrastructure.Data;
 using Microsoft.Data.Sqlite;
@@ -28,7 +29,12 @@ public sealed class DatabaseMigrationTests
         (await dbContext.Readers.CountAsync(cancellationToken)).Should().Be(10);
         (await dbContext.BorrowSlips.CountAsync(cancellationToken)).Should().Be(3);
         (await dbContext.Fines.CountAsync(cancellationToken)).Should().Be(2);
-        (await dbContext.SystemSettings.CountAsync(cancellationToken)).Should().Be(8);
+        (await dbContext.SystemSettings.CountAsync(cancellationToken)).Should().Be(9);
+        (await dbContext.SystemSettings.SingleAsync(
+                setting =>
+                    setting.Key == SystemSettingKeys.MaximumOutstandingFineAmount,
+                cancellationToken))
+            .Value.Should().Be("0");
     }
 
     [Fact]

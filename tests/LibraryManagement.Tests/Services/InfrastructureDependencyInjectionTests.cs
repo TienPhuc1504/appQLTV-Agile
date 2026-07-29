@@ -60,6 +60,75 @@ public sealed class InfrastructureDependencyInjectionTests
         provider.GetRequiredService<IPublisherService>()
             .Should()
             .BeOfType<PublisherService>();
+        provider.GetRequiredService<IBookRepository>()
+            .Should()
+            .BeOfType<BookRepository>();
+        provider.GetRequiredService<IBookCopyRepository>()
+            .Should()
+            .BeOfType<BookCopyRepository>();
+        provider.GetRequiredService<IBookService>()
+            .Should()
+            .BeOfType<BookService>();
+        provider.GetRequiredService<IBookCopyService>()
+            .Should()
+            .BeOfType<BookCopyService>();
+        provider.GetRequiredService<IBookCoverStorageService>()
+            .Should()
+            .BeOfType<BookCoverStorageService>();
+        provider.GetRequiredService<IReaderRepository>()
+            .Should()
+            .BeOfType<ReaderRepository>();
+        provider.GetRequiredService<IReaderService>()
+            .Should()
+            .BeOfType<ReaderService>();
+        provider.GetRequiredService<IBorrowRepository>()
+            .Should()
+            .BeOfType<BorrowRepository>();
+        provider.GetRequiredService<IBorrowService>()
+            .Should()
+            .BeOfType<BorrowService>();
+        provider.GetRequiredService<IReturnRepository>()
+            .Should()
+            .BeOfType<ReturnRepository>();
+        provider.GetRequiredService<IReturnService>()
+            .Should()
+            .BeOfType<ReturnService>();
+        provider.GetRequiredService<IFineRepository>()
+            .Should()
+            .BeOfType<FineRepository>();
+        provider.GetRequiredService<IFineService>()
+            .Should()
+            .BeOfType<FineService>();
+        provider.GetRequiredService<IDashboardRepository>()
+            .Should()
+            .BeOfType<DashboardRepository>();
+        provider.GetRequiredService<IDashboardService>()
+            .Should()
+            .BeOfType<DashboardService>();
+        provider.GetRequiredService<TimeProvider>()
+            .Should()
+            .BeSameAs(TimeProvider.System);
+        provider.GetRequiredService<IEmployeeRepository>()
+            .Should()
+            .BeOfType<EmployeeRepository>();
+        provider.GetRequiredService<IEmployeeService>()
+            .Should()
+            .BeOfType<EmployeeService>();
+        provider.GetRequiredService<ISystemSettingRepository>()
+            .Should()
+            .BeOfType<SystemSettingRepository>();
+        provider.GetRequiredService<ISystemSettingService>()
+            .Should()
+            .BeOfType<SystemSettingService>();
+        provider.GetRequiredService<IActivityLogRepository>()
+            .Should()
+            .BeOfType<ActivityLogRepository>();
+        provider.GetRequiredService<IActivityLogService>()
+            .Should()
+            .BeOfType<ActivityLogService>();
+        provider.GetRequiredService<IDatabaseBackupService>()
+            .Should()
+            .BeOfType<DatabaseBackupService>();
     }
 
     [Fact]
@@ -83,13 +152,18 @@ public sealed class InfrastructureDependencyInjectionTests
         var values = new Dictionary<string, string?>
         {
             ["ConnectionStrings:LibraryDatabase"] =
-                "Data Source=:memory:;Foreign Keys=True",
+                $"Data Source={Path.Combine(Path.GetTempPath(), "LibraryManagement.Tests", "di-library.db")};Foreign Keys=True",
             ["Security:BCryptWorkFactor"] = workFactor,
             ["Storage:LoginPreferencesFile"] =
                 Path.Combine(
                     Path.GetTempPath(),
                     "LibraryManagement.Tests",
-                    "login-preferences.json")
+                    "login-preferences.json"),
+            ["Storage:BookCoversDirectory"] =
+                Path.Combine(
+                    Path.GetTempPath(),
+                    "LibraryManagement.Tests",
+                    "BookCovers")
         };
 
         return new ConfigurationBuilder()

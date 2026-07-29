@@ -4,6 +4,7 @@ using LibraryManagement.App;
 using LibraryManagement.App.Dialogs;
 using LibraryManagement.App.Navigation;
 using LibraryManagement.App.Notifications;
+using LibraryManagement.App.Services;
 using LibraryManagement.App.Themes;
 using LibraryManagement.App.ViewModels;
 using LibraryManagement.Core.DTOs;
@@ -39,6 +40,9 @@ public sealed class PresentationDependencyInjectionTests
         provider.GetRequiredService<IAppThemeService>()
             .Should()
             .BeOfType<AppThemeService>();
+        provider.GetRequiredService<IDatabaseFilePickerService>()
+            .Should()
+            .BeOfType<DatabaseFilePickerService>();
         provider.GetRequiredService<MainViewModel>()
             .Should()
             .BeSameAs(provider.GetRequiredService<MainViewModel>());
@@ -54,6 +58,36 @@ public sealed class PresentationDependencyInjectionTests
         provider.GetRequiredService<PublisherViewModel>()
             .Should()
             .NotBeSameAs(provider.GetRequiredService<PublisherViewModel>());
+        provider.GetRequiredService<BookViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<BookViewModel>());
+        provider.GetRequiredService<BookCopyViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<BookCopyViewModel>());
+        provider.GetRequiredService<ReaderViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<ReaderViewModel>());
+        provider.GetRequiredService<BorrowViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<BorrowViewModel>());
+        provider.GetRequiredService<ReturnViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<ReturnViewModel>());
+        provider.GetRequiredService<FineViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<FineViewModel>());
+        provider.GetRequiredService<DashboardViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<DashboardViewModel>());
+        provider.GetRequiredService<EmployeeViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<EmployeeViewModel>());
+        provider.GetRequiredService<SettingsViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<SettingsViewModel>());
+        provider.GetRequiredService<ActivityLogViewModel>()
+            .Should()
+            .NotBeSameAs(provider.GetRequiredService<ActivityLogViewModel>());
     }
 
     [Fact]
@@ -123,14 +157,19 @@ public sealed class PresentationDependencyInjectionTests
             provider.GetRequiredService<AuthorViewModel>();
         PublisherViewModel publisherViewModel =
             provider.GetRequiredService<PublisherViewModel>();
+        ReaderViewModel readerViewModel =
+            provider.GetRequiredService<ReaderViewModel>();
 
         categoryViewModel.Name = string.Empty;
         authorViewModel.DateOfBirth = DateTime.Today.AddDays(1);
         publisherViewModel.Email = "email-khong-hop-le";
+        readerViewModel.FullName = string.Empty;
+        readerViewModel.Email = "email-khong-hop-le";
 
         categoryViewModel.Validate().Should().BeFalse();
         authorViewModel.Validate().Should().BeFalse();
         publisherViewModel.Validate().Should().BeFalse();
+        readerViewModel.Validate().Should().BeFalse();
         GetFirstValidationMessage(categoryViewModel, nameof(CategoryViewModel.Name))
             .Should()
             .Be("Vui lòng nhập tên thể loại.");
@@ -142,6 +181,16 @@ public sealed class PresentationDependencyInjectionTests
         GetFirstValidationMessage(
                 publisherViewModel,
                 nameof(PublisherViewModel.Email))
+            .Should()
+            .Be("Email không đúng định dạng.");
+        GetFirstValidationMessage(
+                readerViewModel,
+                nameof(ReaderViewModel.FullName))
+            .Should()
+            .Be("Vui lòng nhập tên độc giả.");
+        GetFirstValidationMessage(
+                readerViewModel,
+                nameof(ReaderViewModel.Email))
             .Should()
             .Be("Email không đúng định dạng.");
     }
@@ -187,13 +236,18 @@ public sealed class PresentationDependencyInjectionTests
                 new Dictionary<string, string?>
                 {
                     ["ConnectionStrings:LibraryDatabase"] =
-                        "Data Source=:memory:;Foreign Keys=True",
+                        $"Data Source={Path.Combine(Path.GetTempPath(), "LibraryManagement.Tests", "presentation-library.db")};Foreign Keys=True",
                     ["Security:BCryptWorkFactor"] = "4",
                     ["Storage:LoginPreferencesFile"] =
                         Path.Combine(
                             Path.GetTempPath(),
                             "LibraryManagement.Tests",
-                            "presentation-login-preferences.json")
+                            "presentation-login-preferences.json"),
+                    ["Storage:BookCoversDirectory"] =
+                        Path.Combine(
+                            Path.GetTempPath(),
+                            "LibraryManagement.Tests",
+                            "BookCovers")
                 })
             .Build();
     }

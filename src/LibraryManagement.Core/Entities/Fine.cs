@@ -31,5 +31,7 @@ public sealed class Fine : AuditableEntity
 
     public ICollection<FinePayment> Payments { get; set; } = [];
 
-    public decimal OutstandingAmount => Math.Max(0m, Amount - PaidAmount);
+    public decimal OutstandingAmount => Status == FineStatus.Waived
+        ? 0m
+        : Math.Max(0m, Amount - PaidAmount);
 }

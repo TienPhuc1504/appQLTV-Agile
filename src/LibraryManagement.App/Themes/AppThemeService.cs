@@ -1,4 +1,5 @@
 using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 
 namespace LibraryManagement.App.Themes;
 
@@ -22,7 +23,7 @@ public sealed class AppThemeService : IAppThemeService
             return;
         }
 
-        ApplicationThemeManager.Apply(targetTheme);
+        ApplicationThemeManager.Apply(targetTheme, WindowBackdropType.None);
         ThemeChanged?.Invoke(this, EventArgs.Empty);
     }
 

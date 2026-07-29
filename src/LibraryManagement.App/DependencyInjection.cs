@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using LibraryManagement.App.Dialogs;
 using LibraryManagement.App.Navigation;
 using LibraryManagement.App.Notifications;
+using LibraryManagement.App.Services;
 using LibraryManagement.App.Themes;
 using LibraryManagement.App.ViewModels;
 using LibraryManagement.App.Views;
@@ -24,6 +25,8 @@ public static class DependencyInjection
         services.AddSingleton<IAppNotificationService, AppNotificationService>();
         services.AddSingleton<IAppThemeService, AppThemeService>();
         services.AddSingleton<IMessenger, WeakReferenceMessenger>();
+        services.AddSingleton<IBookCoverPickerService, BookCoverPickerService>();
+        services.AddSingleton<IDatabaseFilePickerService, DatabaseFilePickerService>();
 
         services.AddSingleton<MainViewModel>();
         services.AddTransient<LoginViewModel>();
@@ -31,12 +34,32 @@ public static class DependencyInjection
         services.AddTransient<CategoryViewModel>();
         services.AddTransient<AuthorViewModel>();
         services.AddTransient<PublisherViewModel>();
+        services.AddTransient<BookViewModel>();
+        services.AddTransient<BookCopyViewModel>();
+        services.AddTransient<ReaderViewModel>();
+        services.AddTransient<BorrowViewModel>();
+        services.AddTransient<ReturnViewModel>();
+        services.AddTransient<FineViewModel>();
+        services.AddTransient<DashboardViewModel>();
+        services.AddTransient<EmployeeViewModel>();
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<ActivityLogViewModel>();
 
         services.AddTransient<LoginView>();
         services.AddTransient<FoundationPage>();
         services.AddTransient<CategoryPage>();
         services.AddTransient<AuthorPage>();
         services.AddTransient<PublisherPage>();
+        services.AddTransient<BookPage>();
+        services.AddTransient<BookCopyPage>();
+        services.AddTransient<ReaderPage>();
+        services.AddTransient<BorrowPage>();
+        services.AddTransient<ReturnPage>();
+        services.AddTransient<FinePage>();
+        services.AddTransient<DashboardPage>();
+        services.AddTransient<EmployeePage>();
+        services.AddTransient<SettingsPage>();
+        services.AddTransient<ActivityLogPage>();
         services.AddTransient<MainWindow>();
 
         return services;

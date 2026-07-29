@@ -1,10 +1,13 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Messaging;
+using LibraryManagement.App.Logging;
 using LibraryManagement.App.Messages;
 using LibraryManagement.App.Views;
 using LibraryManagement.Infrastructure;
 using LibraryManagement.Infrastructure.Initialization;
+using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +36,7 @@ public partial class App : Application
         builder.Logging.ClearProviders();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
         builder.Logging.AddDebug();
+        builder.Logging.AddDailyFile(builder.Configuration);
 
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddPresentation();
@@ -43,6 +47,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        RegisterGlobalExceptionHandlers();
 
         try
         {
@@ -75,6 +80,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        UnregisterGlobalExceptionHandlers();
         _host.Services
             .GetRequiredService<IMessenger>()
             .UnregisterAll(this);
@@ -86,6 +92,81 @@ public partial class App : Application
         _host.Dispose();
 
         base.OnExit(e);
+    }
+
+    private void RegisterGlobalExceptionHandlers()
+    {
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+    }
+
+    private void UnregisterGlobalExceptionHandlers()
+    {
+        DispatcherUnhandledException -= OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException -= OnUnhandledException;
+        TaskScheduler.UnobservedTaskException -= OnUnobservedTaskException;
+    }
+
+    private void OnDispatcherUnhandledException(
+        object sender,
+        DispatcherUnhandledExceptionEventArgs e)
+    {
+        ILogger<App> logger = _host.Services.GetRequiredService<ILogger<App>>();
+        logger.LogError(e.Exception, "Lỗi chưa được xử lý trên UI thread.");
+
+        MessageBox.Show(
+            GetFriendlyUnhandledErrorMessage(e.Exception),
+            "Đã xảy ra lỗi",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+        e.Handled = true;
+    }
+
+    private void OnUnhandledException(
+        object sender,
+        UnhandledExceptionEventArgs e)
+    {
+        ILogger<App> logger = _host.Services.GetRequiredService<ILogger<App>>();
+        if (e.ExceptionObject is Exception exception)
+        {
+            logger.LogCritical(
+                exception,
+                "Lỗi nghiêm trọng chưa được xử lý. IsTerminating={IsTerminating}.",
+                e.IsTerminating);
+        }
+        else
+        {
+            logger.LogCritical(
+                "Lỗi nghiêm trọng chưa được xử lý. IsTerminating={IsTerminating}.",
+                e.IsTerminating);
+        }
+    }
+
+    private void OnUnobservedTaskException(
+        object? sender,
+        UnobservedTaskExceptionEventArgs e)
+    {
+        ILogger<App> logger = _host.Services.GetRequiredService<ILogger<App>>();
+        logger.LogError(
+            e.Exception,
+            "Task nền phát sinh lỗi chưa được quan sát.");
+        e.SetObserved();
+    }
+
+    private static string GetFriendlyUnhandledErrorMessage(Exception exception)
+    {
+        return exception switch
+        {
+            SqliteException { SqliteErrorCode: 5 or 6 } =>
+                "Cơ sở dữ liệu đang được sử dụng. Vui lòng thử lại sau.",
+            FileNotFoundException =>
+                "Không tìm thấy file cần thiết. Vui lòng kiểm tra lại đường dẫn.",
+            UnauthorizedAccessException =>
+                "Bạn không có quyền thực hiện thao tác này.",
+            _ =>
+                "Đã xảy ra lỗi ngoài dự kiến. Chi tiết kỹ thuật đã được ghi vào nhật ký."
+        };
     }
 
     private void RegisterApplicationMessages()
