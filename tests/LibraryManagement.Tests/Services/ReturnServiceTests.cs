@@ -375,6 +375,29 @@ public sealed class ReturnServiceTests
             item => item.BorrowSlipDetailId == detailId);
     }
 
+    [Fact]
+    public async Task SearchOutstanding_WithEmptyKeyword_ShouldReturnOutstandingBooks()
+    {
+        await using ReturnServiceHarness harness =
+            await ReturnServiceHarness.CreateAsync();
+        int detailId = await harness.CreateBorrowSlipAsync(
+            [2],
+            Today.AddDays(-5),
+            Today.AddDays(1));
+        IReturnService service =
+            harness.Provider.GetRequiredService<IReturnService>();
+
+        IReadOnlyList<ReturnLookupDto> results =
+            await service.SearchOutstandingAsync(
+                "   ",
+                TestContext.Current.CancellationToken);
+
+        results
+            .SelectMany(result => result.Books)
+            .Should()
+            .Contain(item => item.BorrowSlipDetailId == detailId);
+    }
+
     private sealed class ReturnServiceHarness : IAsyncDisposable
     {
         private ReturnServiceHarness(

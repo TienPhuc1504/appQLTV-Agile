@@ -19,12 +19,31 @@ public sealed partial class CategoryViewModel(
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
     [NotifyPropertyChangedFor(nameof(StatusActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
     public partial CategoryDto? SelectedItem { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmptyMode))]
+    [NotifyPropertyChangedFor(nameof(IsCreateMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
+    [NotifyPropertyChangedFor(nameof(IsFormMode))]
+    [NotifyPropertyChangedFor(nameof(EditorEyebrow))]
+    [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(SaveActionText))]
+    [NotifyPropertyChangedFor(nameof(CancelActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
+    public partial CategoryEditorMode EditorMode { get; private set; } =
+        CategoryEditorMode.Empty;
+
+    [ObservableProperty]
     [NotifyDataErrorInfo]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
     [Required(ErrorMessage = "Vui lòng nhập tên thể loại.")]
     [MaxLength(100, ErrorMessage = "Tên thể loại không được vượt quá 100 ký tự.")]
     public partial string Name { get; set; } = string.Empty;
@@ -34,20 +53,60 @@ public sealed partial class CategoryViewModel(
     [MaxLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự.")]
     public partial string? Description { get; set; }
 
+    public bool IsEmptyMode => EditorMode == CategoryEditorMode.Empty;
+
+    public bool IsCreateMode => EditorMode == CategoryEditorMode.Create;
+
+    public bool IsEditMode => EditorMode == CategoryEditorMode.Edit;
+
+    public bool IsFormMode => IsCreateMode || IsEditMode;
+
+    public string EditorEyebrow =>
+        IsCreateMode ? "THÊM MỚI" : "CHỈNH SỬA";
+
     public string EditorTitle =>
-        SelectedItem is null ? "Thêm thể loại" : "Cập nhật thể loại";
+        IsCreateMode ? "Thêm thể loại" : "Chỉnh sửa thể loại";
+
+    public string EditorDescription
+    {
+        get
+        {
+            if (IsCreateMode)
+            {
+                return "Nhập thông tin để tạo thể loại mới.";
+            }
+
+            return string.IsNullOrWhiteSpace(Name)
+                ? "Cập nhật thông tin thể loại đã chọn."
+                : $"Cập nhật thông tin của thể loại “{Name}”.";
+        }
+    }
+
+    public string SaveActionText =>
+        IsCreateMode ? "Tạo thể loại" : "Lưu thay đổi";
+
+    public string CancelActionText =>
+        IsCreateMode ? "Hủy" : "Hủy thay đổi";
+
+    public string StatusText =>
+        SelectedItem?.IsActive == true
+            ? "Đang hoạt động"
+            : "Ngừng sử dụng";
 
     public string StatusActionText =>
-        SelectedItem?.IsActive == true ? "Ngừng sử dụng" : "Kích hoạt";
+        SelectedItem?.IsActive == true
+            ? "Ngừng sử dụng"
+            : "Kích hoạt lại";
 
     [RelayCommand]
     private void New()
     {
         SelectedItem = null;
         ClearEditor();
+        EditorMode = CategoryEditorMode.Create;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSave))]
     private Task SaveAsync(CancellationToken cancellationToken)
     {
         if (!Validate())
@@ -59,6 +118,8 @@ public sealed partial class CategoryViewModel(
         return ExecuteBusyAsync(
             async token =>
             {
+                bool isCreating = IsCreateMode;
+                int? selectedItemId = SelectedItem?.Id;
                 var request = new CategoryUpsertRequest(
                     Name,
                     Description,
@@ -76,15 +137,33 @@ public sealed partial class CategoryViewModel(
                 }
 
                 notificationService.Show(
-                    "Lưu thành công",
-                    "Thông tin thể loại đã được cập nhật.",
+                    isCreating ? "Tạo thành công" : "Lưu thành công",
+                    isCreating
+                        ? "Thể loại mới đã được tạo."
+                        : "Thông tin thể loại đã được cập nhật.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+
+                if (!isCreating && selectedItemId.HasValue)
+                {
+                    SelectedItem = Items.FirstOrDefault(
+                        item => item.Id == selectedItemId.Value);
+                    if (SelectedItem is not null)
+                    {
+                        return;
+                    }
+                }
+
+                ResetToEmpty();
             },
             "Đang lưu thể loại...",
             cancellationToken);
+    }
+
+    [RelayCommand]
+    private void Cancel()
+    {
+        ResetToEmpty();
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleStatus))]
@@ -121,9 +200,8 @@ public sealed partial class CategoryViewModel(
                     "Cập nhật thành công",
                     $"Đã {action} thể loại.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+                ResetToEmpty();
             },
             "Đang cập nhật trạng thái...",
             cancellationToken);
@@ -153,6 +231,7 @@ public sealed partial class CategoryViewModel(
         if (value is null)
         {
             ClearEditor();
+            EditorMode = CategoryEditorMode.Empty;
             return;
         }
 
@@ -160,9 +239,21 @@ public sealed partial class CategoryViewModel(
         Description = value.Description;
         ClearValidation();
         ErrorMessage = null;
+        EditorMode = CategoryEditorMode.Edit;
     }
 
-    private bool CanToggleStatus() => SelectedItem is not null;
+    private bool CanSave() =>
+        IsCreateMode || (IsEditMode && SelectedItem is not null);
+
+    private bool CanToggleStatus() =>
+        IsEditMode && SelectedItem is not null;
+
+    private void ResetToEmpty()
+    {
+        SelectedItem = null;
+        ClearEditor();
+        EditorMode = CategoryEditorMode.Empty;
+    }
 
     private void ClearEditor()
     {

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:LibraryManagement.App.Controls"
     xmlns:pages="clr-namespace:LibraryManagement.App.Views.Pages"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="{Binding ApplicationName}"
@@ -64,49 +65,114 @@
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
-        <ui:NavigationView
+        <controls:LibraryNavigationView
             x:Name="RootNavigation"
             Grid.Row="1"
             IsBackButtonVisible="Visible"
             IsPaneToggleVisible="True"
+            OpenPaneLength="260"
             PaneDisplayMode="Left"
             PaneTitle="Thư viện">
+            <controls:LibraryNavigationView.Resources>
+                <Style
+                    BasedOn="{StaticResource {x:Type ui:NavigationViewItem}}"
+                    TargetType="{x:Type ui:NavigationViewItem}">
+                    <Setter Property="ToolTip" Value="{x:Null}" />
+                    <Style.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsPaneOpen, RelativeSource={RelativeSource AncestorType={x:Type ui:NavigationView}}}"
+                            Value="False">
+                            <Setter
+                                Property="ToolTip"
+                                Value="{Binding Content, RelativeSource={RelativeSource Self}}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <Style
+                    x:Key="SidebarGroupHeaderStyle"
+                    BasedOn="{StaticResource {x:Type ui:NavigationViewItemHeader}}"
+                    TargetType="{x:Type ui:NavigationViewItemHeader}">
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter
+                        Property="Foreground"
+                        Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <Setter Property="Margin" Value="12,8,0,4" />
+                    <Style.Triggers>
+                        <DataTrigger
+                            Binding="{Binding IsPaneOpen, RelativeSource={RelativeSource AncestorType={x:Type ui:NavigationView}}}"
+                            Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <Style
+                    x:Key="AdminSidebarGroupHeaderStyle"
+                    BasedOn="{StaticResource SidebarGroupHeaderStyle}"
+                    TargetType="{x:Type ui:NavigationViewItemHeader}">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding CanManageEmployees}" Value="False" />
+                                <Condition Binding="{Binding CanViewActivityLogs}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </controls:LibraryNavigationView.Resources>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem
                     Content="Tổng quan"
                     Icon="{ui:SymbolIcon Home24}"
                     TargetPageType="{x:Type pages:DashboardPage}" />
-                <ui:NavigationViewItem
-                    Content="Nền tảng ứng dụng"
-                    TargetPageType="{x:Type pages:FoundationPage}" />
-                <ui:NavigationViewItem
-                    Content="Thể loại"
-                    TargetPageType="{x:Type pages:CategoryPage}" />
-                <ui:NavigationViewItem
-                    Content="Tác giả"
-                    TargetPageType="{x:Type pages:AuthorPage}" />
-                <ui:NavigationViewItem
-                    Content="Nhà xuất bản"
-                    TargetPageType="{x:Type pages:PublisherPage}" />
-                <ui:NavigationViewItem
-                    Content="Quản lý sách"
-                    TargetPageType="{x:Type pages:BookPage}" />
-                <ui:NavigationViewItem
-                    Content="Quản lý bản sách"
-                    TargetPageType="{x:Type pages:BookCopyPage}" />
-                <ui:NavigationViewItem
-                    Content="Quản lý độc giả"
-                    Icon="{ui:SymbolIcon PeopleCommunity24}"
-                    TargetPageType="{x:Type pages:ReaderPage}" />
+                <ui:NavigationViewItemHeader
+                    Style="{StaticResource SidebarGroupHeaderStyle}"
+                    Text="Nghiệp vụ" />
                 <ui:NavigationViewItem
                     Content="Mượn sách"
+                    Icon="{ui:SymbolIcon BookAdd24}"
                     TargetPageType="{x:Type pages:BorrowPage}" />
                 <ui:NavigationViewItem
                     Content="Trả sách"
+                    Icon="{ui:SymbolIcon ArrowReply24}"
                     TargetPageType="{x:Type pages:ReturnPage}" />
                 <ui:NavigationViewItem
+                    Content="Độc giả"
+                    Icon="{ui:SymbolIcon PeopleCommunity24}"
+                    TargetPageType="{x:Type pages:ReaderPage}" />
+                <ui:NavigationViewItem
                     Content="Tiền phạt"
+                    Icon="{ui:SymbolIcon ReceiptMoney24}"
                     TargetPageType="{x:Type pages:FinePage}" />
+                <ui:NavigationViewItemHeader
+                    Style="{StaticResource SidebarGroupHeaderStyle}"
+                    Text="Kho sách" />
+                <ui:NavigationViewItem
+                    Content="Sách"
+                    Icon="{ui:SymbolIcon Book24}"
+                    TargetPageType="{x:Type pages:BookPage}" />
+                <ui:NavigationViewItem
+                    Content="Bản sách"
+                    Icon="{ui:SymbolIcon Copy24}"
+                    TargetPageType="{x:Type pages:BookCopyPage}" />
+                <ui:NavigationViewItemHeader
+                    Style="{StaticResource SidebarGroupHeaderStyle}"
+                    Text="Danh mục" />
+                <ui:NavigationViewItem
+                    Content="Thể loại"
+                    Icon="{ui:SymbolIcon Tag24}"
+                    TargetPageType="{x:Type pages:CategoryPage}" />
+                <ui:NavigationViewItem
+                    Content="Tác giả"
+                    Icon="{ui:SymbolIcon Person24}"
+                    TargetPageType="{x:Type pages:AuthorPage}" />
+                <ui:NavigationViewItem
+                    Content="Nhà xuất bản"
+                    Icon="{ui:SymbolIcon BuildingFactory24}"
+                    TargetPageType="{x:Type pages:PublisherPage}" />
+                <ui:NavigationViewItemHeader
+                    Style="{StaticResource AdminSidebarGroupHeaderStyle}"
+                    Text="Quản trị" />
                 <ui:NavigationViewItem
                     Content="Nhân viên"
                     Icon="{ui:SymbolIcon PersonAccounts24}"
@@ -114,6 +180,7 @@
                     Visibility="{Binding CanManageEmployees, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 <ui:NavigationViewItem
                     Content="Nhật ký hoạt động"
+                    Icon="{ui:SymbolIcon History24}"
                     TargetPageType="{x:Type pages:ActivityLogPage}"
                     Visibility="{Binding CanViewActivityLogs, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </ui:NavigationView.MenuItems>
@@ -124,7 +191,7 @@
                     TargetPageType="{x:Type pages:SettingsPage}"
                     Visibility="{Binding CanManageSystemSettings, Converter={StaticResource BooleanToVisibilityConverter}}" />
             </ui:NavigationView.FooterMenuItems>
-        </ui:NavigationView>
+        </controls:LibraryNavigationView>
 
         <Border
             Grid.Row="1"

@@ -17,6 +17,47 @@ namespace LibraryManagement.Tests.Services;
 public sealed class BorrowServiceTests
 {
     [Fact]
+    public async Task ValidateReaderEligibility_WithValidReader_ShouldSucceed()
+    {
+        CancellationToken cancellationToken =
+            TestContext.Current.CancellationToken;
+        await using var harness =
+            await BorrowServiceHarness.CreateAsync(cancellationToken);
+        IBorrowService service =
+            harness.Provider.GetRequiredService<IBorrowService>();
+
+        OperationResult result =
+            await service.ValidateReaderEligibilityAsync(
+                4,
+                cancellationToken);
+
+        result.Succeeded.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ValidateReaderEligibility_WhenMaximumReached_ShouldFail()
+    {
+        CancellationToken cancellationToken =
+            TestContext.Current.CancellationToken;
+        await using var harness =
+            await BorrowServiceHarness.CreateAsync(cancellationToken);
+        await harness.SetSettingAsync(
+            SystemSettingKeys.MaximumBorrowedBooks,
+            "1",
+            cancellationToken);
+        IBorrowService service =
+            harness.Provider.GetRequiredService<IBorrowService>();
+
+        OperationResult result =
+            await service.ValidateReaderEligibilityAsync(
+                1,
+                cancellationToken);
+
+        result.Succeeded.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("tối đa 1");
+    }
+
+    [Fact]
     public async Task CreateBorrowSlip_WithValidRequest_ShouldCommitAllChanges()
     {
         CancellationToken cancellationToken =

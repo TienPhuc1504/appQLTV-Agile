@@ -4,44 +4,35 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:LibraryManagement.App.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Thể loại"
     d:DesignHeight="650"
     d:DesignWidth="1000"
     Loaded="OnLoaded"
     mc:Ignorable="d">
-    <Grid Margin="28">
+    <Grid Margin="{StaticResource PagePadding}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="{StaticResource SectionSpacing}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <TextBlock
-                    FontSize="28"
-                    FontWeight="SemiBold"
-                    Text="Quản lý thể loại" />
-                <TextBlock
-                    Margin="0,6,0,0"
-                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                    Text="Tìm kiếm, thêm, cập nhật và ngừng sử dụng thể loại sách." />
-            </StackPanel>
-            <ui:Button
-                Grid.Column="1"
-                MinWidth="110"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Appearance="Primary"
-                Command="{Binding NewCommand}"
-                Content="Thêm mới" />
-        </Grid>
+        <controls:PageHeader
+            Description="Quản lý các thể loại dùng để phân loại sách trong thư viện."
+            Title="Quản lý thể loại">
+            <controls:PageHeader.TrailingContent>
+                <ui:Button
+                    MinWidth="110"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Appearance="Primary"
+                    Command="{Binding NewCommand}"
+                    Content="Thêm mới" />
+            </controls:PageHeader.TrailingContent>
+        </controls:PageHeader>
 
-        <Grid Grid.Row="1" Margin="0,24,0,0">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MinWidth="420" />
                 <ColumnDefinition Width="20" />
@@ -130,68 +121,140 @@
 
             <Border
                 Grid.Column="2"
-                Padding="22"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                CornerRadius="8">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="24">
+                <Grid>
+                    <StackPanel
+                        MaxWidth="320"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding IsEmptyMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ui:SymbolIcon
+                            HorizontalAlignment="Center"
+                            FontSize="36"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Symbol="Tag24" />
                         <TextBlock
-                            FontSize="19"
-                            FontWeight="SemiBold"
-                            Text="{Binding EditorTitle}" />
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource SectionTitleTextStyle}"
+                            Text="Chưa chọn thể loại"
+                            TextAlignment="Center" />
                         <TextBlock
-                            Margin="0,18,0,6"
-                            FontWeight="SemiBold"
-                            Text="Tên thể loại *" />
-                        <ui:TextBox
-                            x:Name="CategoryNameInput"
-                            MaxLength="100"
-                            Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
-                        <TextBlock
-                            Margin="0,5,0,0"
-                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
-                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=CategoryNameInput}"
-                            TextWrapping="Wrap"
-                            Visibility="{Binding (Validation.HasError), ElementName=CategoryNameInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBlock
-                            Margin="0,14,0,6"
-                            FontWeight="SemiBold"
-                            Text="Mô tả" />
-                        <ui:TextBox
-                            x:Name="CategoryDescriptionInput"
-                            MinHeight="110"
-                            MaxLength="500"
-                            AcceptsReturn="True"
-                            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                            Margin="0,8,0,0"
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Text="Chọn một thể loại trong danh sách để chỉnh sửa hoặc nhấn “Thêm mới” để tạo thể loại."
+                            TextAlignment="Center"
                             TextWrapping="Wrap" />
-                        <TextBlock
-                            Margin="0,5,0,0"
-                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
-                            Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=CategoryDescriptionInput}"
-                            TextWrapping="Wrap"
-                            Visibility="{Binding (Validation.HasError), ElementName=CategoryDescriptionInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                        <TextBlock
-                            Margin="0,14,0,0"
-                            Foreground="{DynamicResource SystemFillColorCriticalBrush}"
-                            Text="{Binding ErrorMessage}"
-                            TextWrapping="Wrap"
-                            Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <ui:Button
-                            MinHeight="40"
-                            Margin="0,20,0,0"
-                            HorizontalAlignment="Stretch"
+                            MinHeight="36"
+                            Margin="0,16,0,0"
+                            HorizontalAlignment="Center"
                             Appearance="Primary"
-                            Command="{Binding SaveCommand}"
-                            Content="Lưu thể loại" />
-                        <ui:Button
-                            MinHeight="38"
-                            Margin="0,10,0,0"
-                            HorizontalAlignment="Stretch"
-                            Appearance="Secondary"
-                            Command="{Binding ToggleStatusCommand}"
-                            Content="{Binding StatusActionText}" />
+                            Command="{Binding NewCommand}"
+                            Content="Thêm thể loại" />
                     </StackPanel>
-                </ScrollViewer>
+
+                    <ScrollViewer
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto"
+                        Visibility="{Binding IsFormMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel>
+                            <TextBlock
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                FontWeight="SemiBold"
+                                Text="{Binding EditorEyebrow}" />
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                Style="{StaticResource SectionTitleTextStyle}"
+                                Text="{Binding EditorTitle}" />
+                            <TextBlock
+                                Margin="0,8,0,0"
+                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                Text="{Binding EditorDescription}"
+                                TextWrapping="Wrap" />
+
+                            <TextBlock
+                                Margin="0,24,0,8"
+                                FontWeight="SemiBold"
+                                Text="Tên thể loại *" />
+                            <ui:TextBox
+                                x:Name="CategoryNameInput"
+                                MinHeight="40"
+                                MaxLength="100"
+                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=CategoryNameInput}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding (Validation.HasError), ElementName=CategoryNameInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                            <TextBlock
+                                Margin="0,16,0,8"
+                                FontWeight="SemiBold"
+                                Text="Mô tả" />
+                            <ui:TextBox
+                                x:Name="CategoryDescriptionInput"
+                                MinHeight="110"
+                                MaxLength="500"
+                                AcceptsReturn="True"
+                                Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Margin="0,4,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=CategoryDescriptionInput}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding (Validation.HasError), ElementName=CategoryDescriptionInput, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                            <TextBlock
+                                Margin="0,16,0,0"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                Text="{Binding ErrorMessage}"
+                                TextWrapping="Wrap"
+                                Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+                            <StackPanel
+                                Margin="0,24,0,0"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal">
+                                <ui:Button
+                                    MinHeight="36"
+                                    Command="{Binding CancelCommand}"
+                                    Content="{Binding CancelActionText}" />
+                                <ui:Button
+                                    MinHeight="36"
+                                    Margin="8,0,0,0"
+                                    Appearance="Primary"
+                                    Command="{Binding SaveCommand}"
+                                    Content="{Binding SaveActionText}" />
+                            </StackPanel>
+
+                            <StackPanel
+                                Visibility="{Binding IsEditMode, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <Separator Margin="0,24,0,24" />
+                                <TextBlock
+                                    Style="{StaticResource SectionTitleTextStyle}"
+                                    Text="Trạng thái" />
+                                <TextBlock
+                                    Margin="0,8,0,0"
+                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                    Text="{Binding StatusText}" />
+                                <ui:Button
+                                    MinHeight="36"
+                                    Margin="0,12,0,0"
+                                    HorizontalAlignment="Left"
+                                    Appearance="Secondary"
+                                    Command="{Binding ToggleStatusCommand}"
+                                    Content="{Binding StatusActionText}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
             </Border>
 
             <Border

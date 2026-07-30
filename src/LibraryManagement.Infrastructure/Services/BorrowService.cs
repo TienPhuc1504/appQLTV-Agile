@@ -471,6 +471,13 @@ public sealed class BorrowService(
                 "Độc giả đang có sách quá hạn chưa trả.");
         }
 
+        if (snapshot.ActiveBorrowedCopyCount
+            >= policy.MaximumBorrowedBooks)
+        {
+            return OperationResult.Failure(
+                $"Độc giả đã mượn tối đa {policy.MaximumBorrowedBooks} bản sách cho phép.");
+        }
+
         if (snapshot.OutstandingFineAmount
             > policy.MaximumOutstandingFineAmount)
         {

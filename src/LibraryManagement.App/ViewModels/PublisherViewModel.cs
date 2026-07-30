@@ -19,12 +19,31 @@ public sealed partial class PublisherViewModel(
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
     [NotifyPropertyChangedFor(nameof(StatusActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
     public partial PublisherDto? SelectedItem { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmptyMode))]
+    [NotifyPropertyChangedFor(nameof(IsCreateMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
+    [NotifyPropertyChangedFor(nameof(IsFormMode))]
+    [NotifyPropertyChangedFor(nameof(EditorEyebrow))]
+    [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(SaveActionText))]
+    [NotifyPropertyChangedFor(nameof(CancelActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
+    public partial CatalogEditorMode EditorMode { get; private set; } =
+        CatalogEditorMode.Empty;
+
+    [ObservableProperty]
     [NotifyDataErrorInfo]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
     [Required(ErrorMessage = "Vui lòng nhập tên nhà xuất bản.")]
     [MaxLength(200, ErrorMessage = "Tên nhà xuất bản không được vượt quá 200 ký tự.")]
     public partial string Name { get; set; } = string.Empty;
@@ -55,20 +74,60 @@ public sealed partial class PublisherViewModel(
     [MaxLength(300, ErrorMessage = "Website không được vượt quá 300 ký tự.")]
     public partial string? Website { get; set; }
 
+    public bool IsEmptyMode => EditorMode == CatalogEditorMode.Empty;
+
+    public bool IsCreateMode => EditorMode == CatalogEditorMode.Create;
+
+    public bool IsEditMode => EditorMode == CatalogEditorMode.Edit;
+
+    public bool IsFormMode => IsCreateMode || IsEditMode;
+
+    public string EditorEyebrow =>
+        IsCreateMode ? "THÊM MỚI" : "CHỈNH SỬA";
+
     public string EditorTitle =>
-        SelectedItem is null ? "Thêm nhà xuất bản" : "Cập nhật nhà xuất bản";
+        IsCreateMode ? "Thêm nhà xuất bản" : "Chỉnh sửa nhà xuất bản";
+
+    public string EditorDescription
+    {
+        get
+        {
+            if (IsCreateMode)
+            {
+                return "Nhập thông tin để tạo nhà xuất bản mới.";
+            }
+
+            return string.IsNullOrWhiteSpace(Name)
+                ? "Cập nhật thông tin nhà xuất bản đã chọn."
+                : $"Cập nhật thông tin của nhà xuất bản “{Name}”.";
+        }
+    }
+
+    public string SaveActionText =>
+        IsCreateMode ? "Tạo nhà xuất bản" : "Lưu thay đổi";
+
+    public string CancelActionText =>
+        IsCreateMode ? "Hủy" : "Hủy thay đổi";
+
+    public string StatusText =>
+        SelectedItem?.IsActive == true
+            ? "Đang hoạt động"
+            : "Ngừng sử dụng";
 
     public string StatusActionText =>
-        SelectedItem?.IsActive == true ? "Ngừng sử dụng" : "Kích hoạt";
+        SelectedItem?.IsActive == true
+            ? "Ngừng sử dụng"
+            : "Kích hoạt lại";
 
     [RelayCommand]
     private void New()
     {
         SelectedItem = null;
         ClearEditor();
+        EditorMode = CatalogEditorMode.Create;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSave))]
     private Task SaveAsync(CancellationToken cancellationToken)
     {
         if (!Validate())
@@ -80,6 +139,8 @@ public sealed partial class PublisherViewModel(
         return ExecuteBusyAsync(
             async token =>
             {
+                bool isCreating = IsCreateMode;
+                int? selectedItemId = SelectedItem?.Id;
                 var request = new PublisherUpsertRequest(
                     Name,
                     Address,
@@ -100,15 +161,33 @@ public sealed partial class PublisherViewModel(
                 }
 
                 notificationService.Show(
-                    "Lưu thành công",
-                    "Thông tin nhà xuất bản đã được cập nhật.",
+                    isCreating ? "Tạo thành công" : "Lưu thành công",
+                    isCreating
+                        ? "Nhà xuất bản mới đã được tạo."
+                        : "Thông tin nhà xuất bản đã được cập nhật.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+
+                if (!isCreating && selectedItemId.HasValue)
+                {
+                    SelectedItem = Items.FirstOrDefault(
+                        item => item.Id == selectedItemId.Value);
+                    if (SelectedItem is not null)
+                    {
+                        return;
+                    }
+                }
+
+                ResetToEmpty();
             },
             "Đang lưu nhà xuất bản...",
             cancellationToken);
+    }
+
+    [RelayCommand]
+    private void Cancel()
+    {
+        ResetToEmpty();
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleStatus))]
@@ -145,9 +224,8 @@ public sealed partial class PublisherViewModel(
                     "Cập nhật thành công",
                     $"Đã {action} nhà xuất bản.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+                ResetToEmpty();
             },
             "Đang cập nhật trạng thái...",
             cancellationToken);
@@ -177,6 +255,7 @@ public sealed partial class PublisherViewModel(
         if (value is null)
         {
             ClearEditor();
+            EditorMode = CatalogEditorMode.Empty;
             return;
         }
 
@@ -187,9 +266,21 @@ public sealed partial class PublisherViewModel(
         Website = value.Website;
         ClearValidation();
         ErrorMessage = null;
+        EditorMode = CatalogEditorMode.Edit;
     }
 
-    private bool CanToggleStatus() => SelectedItem is not null;
+    private bool CanSave() =>
+        IsCreateMode || (IsEditMode && SelectedItem is not null);
+
+    private bool CanToggleStatus() =>
+        IsEditMode && SelectedItem is not null;
+
+    private void ResetToEmpty()
+    {
+        SelectedItem = null;
+        ClearEditor();
+        EditorMode = CatalogEditorMode.Empty;
+    }
 
     private void ClearEditor()
     {

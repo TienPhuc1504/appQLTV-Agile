@@ -23,12 +23,12 @@ public sealed class ReturnService(
         CancellationToken cancellationToken = default)
     {
         ReturnServiceAuthorization.DemandReadAccess(authenticationService);
-        string normalizedKeyword = DomainValidator.MaximumLength(
-            DomainValidator.Required(
+        string normalizedKeyword =
+            DomainValidator.OptionalMaximumLength(
                 keyword,
-                "mã phiếu mượn hoặc mã bản sách"),
-            150,
-            "Mã phiếu mượn hoặc mã bản sách");
+                150,
+                "Từ khóa tìm kiếm")
+            ?? string.Empty;
         return returnRepository.SearchOutstandingAsync(
             normalizedKeyword,
             cancellationToken);

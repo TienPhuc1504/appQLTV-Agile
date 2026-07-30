@@ -52,34 +52,26 @@ public sealed partial class ReturnViewModel : BaseViewModel
         ReturnItems.Count(item => item.IsSelected);
 
     [RelayCommand]
+    private Task LoadAsync(CancellationToken cancellationToken)
+    {
+        return ExecuteBusyAsync(
+            token => LoadOutstandingAsync(
+                keyword: string.Empty,
+                selectSingleResult: false,
+                cancellationToken: token),
+            "Đang tải sách chưa trả...",
+            cancellationToken);
+    }
+
+    [RelayCommand]
     private Task SearchAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(SearchText))
-        {
-            ErrorMessage =
-                "Vui lòng nhập mã phiếu mượn hoặc mã bản sách.";
-            return Task.CompletedTask;
-        }
-
+        string keyword = SearchText.Trim();
         return ExecuteBusyAsync(
-            async token =>
-            {
-                IReadOnlyList<ReturnLookupDto> results =
-                    await _returnService.SearchOutstandingAsync(
-                        SearchText,
-                        token);
-                ApplySearchResults(results);
-
-                if (SearchResults.Count == 0)
-                {
-                    ErrorMessage =
-                        "Không tìm thấy sách đang mượn phù hợp.";
-                }
-                else if (SearchResults.Count == 1)
-                {
-                    SelectedBorrowSlip = SearchResults[0];
-                }
-            },
+            token => LoadOutstandingAsync(
+                keyword,
+                selectSingleResult: keyword.Length > 0,
+                cancellationToken: token),
             "Đang tìm phiếu mượn...",
             cancellationToken);
     }
@@ -128,9 +120,11 @@ public sealed partial class ReturnViewModel : BaseViewModel
                     NotificationSeverity.Success);
                 IReadOnlyList<ReturnLookupDto> refreshedResults =
                     await _returnService.SearchOutstandingAsync(
-                        SearchText,
+                        SearchText.Trim(),
                         token);
-                ApplySearchResults(refreshedResults);
+                ApplySearchResults(
+                    refreshedResults,
+                    selectSingleResult: true);
             },
             "Đang gia hạn sách...",
             cancellationToken);
@@ -205,6 +199,10 @@ public sealed partial class ReturnViewModel : BaseViewModel
                     "Dữ liệu trả sách, trạng thái bản sách và tiền phạt đã được cập nhật.",
                     NotificationSeverity.Success);
                 ClearForm();
+                await LoadOutstandingAsync(
+                    keyword: string.Empty,
+                    selectSingleResult: false,
+                    cancellationToken: token);
             },
             "Đang xử lý trả sách...",
             cancellationToken);
@@ -278,8 +276,25 @@ public sealed partial class ReturnViewModel : BaseViewModel
         NotifySummaryChanged();
     }
 
+    private async Task LoadOutstandingAsync(
+        string keyword,
+        bool selectSingleResult,
+        CancellationToken cancellationToken)
+    {
+        IReadOnlyList<ReturnLookupDto> results =
+            await _returnService.SearchOutstandingAsync(
+                keyword,
+                cancellationToken);
+        ApplySearchResults(results, selectSingleResult);
+        if (results.Count == 0 && keyword.Length > 0)
+        {
+            ErrorMessage = "Không tìm thấy sách đang mượn phù hợp.";
+        }
+    }
+
     private void ApplySearchResults(
-        IReadOnlyList<ReturnLookupDto> results)
+        IReadOnlyList<ReturnLookupDto> results,
+        bool selectSingleResult)
     {
         SelectedBorrowSlip = null;
         SearchResults.Clear();
@@ -288,7 +303,7 @@ public sealed partial class ReturnViewModel : BaseViewModel
             SearchResults.Add(result);
         }
 
-        if (SearchResults.Count == 1)
+        if (selectSingleResult && SearchResults.Count == 1)
         {
             SelectedBorrowSlip = SearchResults[0];
         }

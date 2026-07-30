@@ -26,7 +26,11 @@ Desktop.ini
 
 # Build artifacts and local runtime data
 artifacts/
+TestResults/
+[Bb]uildLog.*
+*.cache
 *.db
 *.db-shm
 *.db-wal
 *.log
+

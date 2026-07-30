@@ -148,6 +148,141 @@ public sealed class PresentationDependencyInjectionTests
     }
 
     [Fact]
+    public void CategoryEditor_ShouldTransitionBetweenEmptyCreateAndEditModes()
+    {
+        using ServiceProvider provider = CreateServiceProvider();
+        CategoryViewModel viewModel =
+            provider.GetRequiredService<CategoryViewModel>();
+        DateTime timestamp = DateTime.UtcNow;
+
+        viewModel.EditorMode.Should().Be(CategoryEditorMode.Empty);
+        viewModel.IsEmptyMode.Should().BeTrue();
+
+        viewModel.NewCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CategoryEditorMode.Create);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.Name.Should().BeEmpty();
+        viewModel.Description.Should().BeNull();
+
+        viewModel.SelectedItem = new CategoryDto(
+            1,
+            "Văn học",
+            "Tác phẩm văn học",
+            true,
+            timestamp,
+            timestamp);
+
+        viewModel.EditorMode.Should().Be(CategoryEditorMode.Edit);
+        viewModel.Name.Should().Be("Văn học");
+        viewModel.Description.Should().Be("Tác phẩm văn học");
+        viewModel.StatusActionText.Should().Be("Ngừng sử dụng");
+
+        viewModel.Name = string.Empty;
+        viewModel.Validate().Should().BeFalse();
+
+        viewModel.CancelCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CategoryEditorMode.Empty);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.Name.Should().BeEmpty();
+        viewModel.Description.Should().BeNull();
+        viewModel.HasErrors.Should().BeFalse();
+    }
+
+    [Fact]
+    public void AuthorEditor_ShouldTransitionBetweenEmptyCreateAndEditModes()
+    {
+        using ServiceProvider provider = CreateServiceProvider();
+        AuthorViewModel viewModel =
+            provider.GetRequiredService<AuthorViewModel>();
+        DateTime timestamp = DateTime.UtcNow;
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Empty);
+
+        viewModel.NewCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Create);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.FullName.Should().BeEmpty();
+
+        viewModel.SelectedItem = new AuthorDto(
+            1,
+            "Nguyễn Nhật Ánh",
+            new DateOnly(1955, 5, 7),
+            "Việt Nam",
+            "Nhà văn",
+            true,
+            timestamp,
+            timestamp);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Edit);
+        viewModel.FullName.Should().Be("Nguyễn Nhật Ánh");
+        viewModel.Nationality.Should().Be("Việt Nam");
+        viewModel.StatusActionText.Should().Be("Ngừng sử dụng");
+
+        viewModel.DateOfBirth = DateTime.Today.AddDays(1);
+        viewModel.Validate().Should().BeFalse();
+
+        viewModel.CancelCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Empty);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.FullName.Should().BeEmpty();
+        viewModel.DateOfBirth.Should().BeNull();
+        viewModel.Nationality.Should().BeNull();
+        viewModel.Biography.Should().BeNull();
+        viewModel.HasErrors.Should().BeFalse();
+    }
+
+    [Fact]
+    public void PublisherEditor_ShouldTransitionBetweenEmptyCreateAndEditModes()
+    {
+        using ServiceProvider provider = CreateServiceProvider();
+        PublisherViewModel viewModel =
+            provider.GetRequiredService<PublisherViewModel>();
+        DateTime timestamp = DateTime.UtcNow;
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Empty);
+
+        viewModel.NewCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Create);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.Name.Should().BeEmpty();
+
+        viewModel.SelectedItem = new PublisherDto(
+            1,
+            "Nhà xuất bản Trẻ",
+            "TP. Hồ Chí Minh",
+            "0901234567",
+            "contact@nxbtre.vn",
+            "https://nxbtre.vn",
+            true,
+            timestamp,
+            timestamp);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Edit);
+        viewModel.Name.Should().Be("Nhà xuất bản Trẻ");
+        viewModel.PhoneNumber.Should().Be("0901234567");
+        viewModel.StatusActionText.Should().Be("Ngừng sử dụng");
+
+        viewModel.Email = "email-khong-hop-le";
+        viewModel.Validate().Should().BeFalse();
+
+        viewModel.CancelCommand.Execute(null);
+
+        viewModel.EditorMode.Should().Be(CatalogEditorMode.Empty);
+        viewModel.SelectedItem.Should().BeNull();
+        viewModel.Name.Should().BeEmpty();
+        viewModel.Address.Should().BeNull();
+        viewModel.PhoneNumber.Should().BeNull();
+        viewModel.Email.Should().BeNull();
+        viewModel.Website.Should().BeNull();
+        viewModel.HasErrors.Should().BeFalse();
+    }
+
+    [Fact]
     public void CatalogViewModels_WithInvalidInput_ShouldExposeVietnameseValidationMessages()
     {
         using ServiceProvider provider = CreateServiceProvider();

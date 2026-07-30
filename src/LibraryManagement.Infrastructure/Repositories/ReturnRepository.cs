@@ -27,23 +27,30 @@ public sealed class ReturnRepository(
         string keyword,
         CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(keyword);
-        string pattern = CreateLikePattern(keyword.Trim());
+        ArgumentNullException.ThrowIfNull(keyword);
+        string normalizedKeyword = keyword.Trim();
         await using LibraryDbContext dbContext =
             await dbContextFactory.CreateDbContextAsync(cancellationToken);
-        List<ReturnSearchRow> rows = await dbContext.BorrowSlipDetails
+        IQueryable<BorrowSlipDetail> query = dbContext.BorrowSlipDetails
             .AsNoTracking()
             .Where(detail =>
-                (detail.Status == BorrowSlipDetailStatus.Borrowing
-                    || detail.Status == BorrowSlipDetailStatus.Overdue)
-                && (EF.Functions.Like(
+                detail.Status == BorrowSlipDetailStatus.Borrowing
+                || detail.Status == BorrowSlipDetailStatus.Overdue);
+        if (normalizedKeyword.Length > 0)
+        {
+            string pattern = CreateLikePattern(normalizedKeyword);
+            query = query.Where(detail =>
+                EF.Functions.Like(
                         detail.BorrowSlip.BorrowCode,
                         pattern,
                         @"\")
-                    || EF.Functions.Like(
-                        detail.BookCopy.CopyCode,
-                        pattern,
-                        @"\")))
+                || EF.Functions.Like(
+                    detail.BookCopy.CopyCode,
+                    pattern,
+                    @"\"));
+        }
+
+        List<ReturnSearchRow> rows = await query
             .OrderByDescending(detail => detail.BorrowSlip.BorrowDate)
             .ThenBy(detail => detail.BookCopy.CopyCode)
             .Take(200)

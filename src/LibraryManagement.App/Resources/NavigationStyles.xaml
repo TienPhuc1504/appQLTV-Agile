@@ -1,0 +1,29 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:LibraryManagement.App.Controls"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <CornerRadius x:Key="NavigationGroupCornerRadius">12</CornerRadius>
+    <Thickness x:Key="NavigationGroupPadding">4</Thickness>
+    <system:Double
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        x:Key="NavigationGroupSpacing">
+        8
+    </system:Double>
+    <Thickness x:Key="NavigationGroupBorderThickness">1</Thickness>
+
+    <Style
+        BasedOn="{StaticResource {x:Type ui:NavigationView}}"
+        TargetType="{x:Type controls:LibraryNavigationView}" />
+
+    <ItemsPanelTemplate x:Key="NavigationGroupCardsItemsPanelTemplate">
+        <controls:NavigationGroupCardsPanel
+            CardBackground="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            CardBorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            CardBorderThickness="{StaticResource NavigationGroupBorderThickness}"
+            CardCornerRadius="{StaticResource NavigationGroupCornerRadius}"
+            CardPadding="{StaticResource NavigationGroupPadding}"
+            CardSpacing="{StaticResource NavigationGroupSpacing}"
+            IsPaneOpen="{Binding IsPaneOpen, RelativeSource={RelativeSource AncestorType={x:Type controls:LibraryNavigationView}}}" />
+    </ItemsPanelTemplate>
+</ResourceDictionary>

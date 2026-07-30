@@ -19,12 +19,31 @@ public sealed partial class AuthorViewModel(
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
     [NotifyPropertyChangedFor(nameof(StatusActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
     [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
     public partial AuthorDto? SelectedItem { get; set; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsEmptyMode))]
+    [NotifyPropertyChangedFor(nameof(IsCreateMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditMode))]
+    [NotifyPropertyChangedFor(nameof(IsFormMode))]
+    [NotifyPropertyChangedFor(nameof(EditorEyebrow))]
+    [NotifyPropertyChangedFor(nameof(EditorTitle))]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
+    [NotifyPropertyChangedFor(nameof(SaveActionText))]
+    [NotifyPropertyChangedFor(nameof(CancelActionText))]
+    [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ToggleStatusCommand))]
+    public partial CatalogEditorMode EditorMode { get; private set; } =
+        CatalogEditorMode.Empty;
+
+    [ObservableProperty]
     [NotifyDataErrorInfo]
+    [NotifyPropertyChangedFor(nameof(EditorDescription))]
     [Required(ErrorMessage = "Vui lòng nhập họ tên tác giả.")]
     [MaxLength(150, ErrorMessage = "Họ tên tác giả không được vượt quá 150 ký tự.")]
     public partial string FullName { get; set; } = string.Empty;
@@ -46,11 +65,50 @@ public sealed partial class AuthorViewModel(
     [MaxLength(4000, ErrorMessage = "Tiểu sử không được vượt quá 4000 ký tự.")]
     public partial string? Biography { get; set; }
 
+    public bool IsEmptyMode => EditorMode == CatalogEditorMode.Empty;
+
+    public bool IsCreateMode => EditorMode == CatalogEditorMode.Create;
+
+    public bool IsEditMode => EditorMode == CatalogEditorMode.Edit;
+
+    public bool IsFormMode => IsCreateMode || IsEditMode;
+
+    public string EditorEyebrow =>
+        IsCreateMode ? "THÊM MỚI" : "CHỈNH SỬA";
+
     public string EditorTitle =>
-        SelectedItem is null ? "Thêm tác giả" : "Cập nhật tác giả";
+        IsCreateMode ? "Thêm tác giả" : "Chỉnh sửa tác giả";
+
+    public string EditorDescription
+    {
+        get
+        {
+            if (IsCreateMode)
+            {
+                return "Nhập thông tin để tạo tác giả mới.";
+            }
+
+            return string.IsNullOrWhiteSpace(FullName)
+                ? "Cập nhật thông tin tác giả đã chọn."
+                : $"Cập nhật thông tin của tác giả “{FullName}”.";
+        }
+    }
+
+    public string SaveActionText =>
+        IsCreateMode ? "Tạo tác giả" : "Lưu thay đổi";
+
+    public string CancelActionText =>
+        IsCreateMode ? "Hủy" : "Hủy thay đổi";
+
+    public string StatusText =>
+        SelectedItem?.IsActive == true
+            ? "Đang hoạt động"
+            : "Ngừng sử dụng";
 
     public string StatusActionText =>
-        SelectedItem?.IsActive == true ? "Ngừng sử dụng" : "Kích hoạt";
+        SelectedItem?.IsActive == true
+            ? "Ngừng sử dụng"
+            : "Kích hoạt lại";
 
     public static ValidationResult? ValidateDateOfBirth(
         DateTime? value,
@@ -66,9 +124,10 @@ public sealed partial class AuthorViewModel(
     {
         SelectedItem = null;
         ClearEditor();
+        EditorMode = CatalogEditorMode.Create;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSave))]
     private Task SaveAsync(CancellationToken cancellationToken)
     {
         if (!Validate())
@@ -80,6 +139,8 @@ public sealed partial class AuthorViewModel(
         return ExecuteBusyAsync(
             async token =>
             {
+                bool isCreating = IsCreateMode;
+                int? selectedItemId = SelectedItem?.Id;
                 var request = new AuthorUpsertRequest(
                     FullName,
                     DateOfBirth.HasValue
@@ -101,15 +162,33 @@ public sealed partial class AuthorViewModel(
                 }
 
                 notificationService.Show(
-                    "Lưu thành công",
-                    "Thông tin tác giả đã được cập nhật.",
+                    isCreating ? "Tạo thành công" : "Lưu thành công",
+                    isCreating
+                        ? "Tác giả mới đã được tạo."
+                        : "Thông tin tác giả đã được cập nhật.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+
+                if (!isCreating && selectedItemId.HasValue)
+                {
+                    SelectedItem = Items.FirstOrDefault(
+                        item => item.Id == selectedItemId.Value);
+                    if (SelectedItem is not null)
+                    {
+                        return;
+                    }
+                }
+
+                ResetToEmpty();
             },
             "Đang lưu tác giả...",
             cancellationToken);
+    }
+
+    [RelayCommand]
+    private void Cancel()
+    {
+        ResetToEmpty();
     }
 
     [RelayCommand(CanExecute = nameof(CanToggleStatus))]
@@ -146,9 +225,8 @@ public sealed partial class AuthorViewModel(
                     "Cập nhật thành công",
                     $"Đã {action} tác giả.",
                     NotificationSeverity.Success);
-                SelectedItem = null;
-                ClearEditor();
                 await RefreshItemsAsync(token);
+                ResetToEmpty();
             },
             "Đang cập nhật trạng thái...",
             cancellationToken);
@@ -178,6 +256,7 @@ public sealed partial class AuthorViewModel(
         if (value is null)
         {
             ClearEditor();
+            EditorMode = CatalogEditorMode.Empty;
             return;
         }
 
@@ -189,9 +268,21 @@ public sealed partial class AuthorViewModel(
         Biography = value.Biography;
         ClearValidation();
         ErrorMessage = null;
+        EditorMode = CatalogEditorMode.Edit;
     }
 
-    private bool CanToggleStatus() => SelectedItem is not null;
+    private bool CanSave() =>
+        IsCreateMode || (IsEditMode && SelectedItem is not null);
+
+    private bool CanToggleStatus() =>
+        IsEditMode && SelectedItem is not null;
+
+    private void ResetToEmpty()
+    {
+        SelectedItem = null;
+        ClearEditor();
+        EditorMode = CatalogEditorMode.Empty;
+    }
 
     private void ClearEditor()
     {
