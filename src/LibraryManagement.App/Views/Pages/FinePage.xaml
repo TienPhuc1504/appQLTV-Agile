@@ -42,14 +42,14 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <ui:TextBox
-                    Margin="0,0,10,0"
+                    Margin="0,0,8,0"
                     AutomationProperties.Name="Từ khóa tiền phạt"
                     MaxLength="150"
                     PlaceholderText="Mã phạt, mã hoặc tên độc giả..."
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                 <ComboBox
                     Grid.Column="1"
-                    Margin="0,0,10,0"
+                    Margin="0,0,8,0"
                     ItemsSource="{Binding FineTypeOptions}"
                     SelectedItem="{Binding SelectedFineType}">
                     <ComboBox.ItemTemplate>
@@ -60,7 +60,7 @@
                 </ComboBox>
                 <ComboBox
                     Grid.Column="2"
-                    Margin="0,0,10,0"
+                    Margin="0,0,8,0"
                     ItemsSource="{Binding StatusOptions}"
                     SelectedItem="{Binding SelectedStatus}">
                     <ComboBox.ItemTemplate>
@@ -74,7 +74,8 @@
                     AutomationProperties.Name="Tìm kiếm tiền phạt"
                     Command="{Binding SearchCommand}"
                     Content="Tìm kiếm"
-                    Icon="{ui:SymbolIcon Search24}" />
+                    Icon="{ui:SymbolIcon Search24}"
+                    Style="{StaticResource SecondaryButtonStyle}" />
             </Grid>
         </Border>
 
@@ -190,7 +191,7 @@
                             PlaceholderText="Ghi chú thanh toán..."
                             Text="{Binding PaymentNotes, UpdateSourceTrigger=PropertyChanged}" />
                         <ui:Button
-                            Margin="0,10,0,0"
+                            Margin="0,8,0,0"
                             Appearance="Primary"
                             AutomationProperties.Name="Thanh toán tiền phạt"
                             Command="{Binding PayCommand}"
@@ -208,7 +209,8 @@
                             PlaceholderText="Lý do miễn phạt..."
                             Text="{Binding WaiverReason, UpdateSourceTrigger=PropertyChanged}" />
                         <ui:Button
-                            Margin="0,10,0,0"
+                            Margin="0,8,0,0"
+                            Appearance="Caution"
                             AutomationProperties.Name="Miễn tiền phạt"
                             Command="{Binding WaiveCommand}"
                             Content="Miễn phạt"
@@ -252,7 +254,8 @@
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                 <ui:Button
                     Command="{Binding PreviousPageCommand}"
-                    Content="Trang trước" />
+                    Content="Trang trước"
+                    Style="{StaticResource GhostButtonStyle}" />
                 <TextBlock
                     Margin="12,0"
                     VerticalAlignment="Center"
@@ -263,7 +266,8 @@
                     Text="{Binding TotalPages, StringFormat=/ {0}}" />
                 <ui:Button
                     Command="{Binding NextPageCommand}"
-                    Content="Trang sau" />
+                    Content="Trang sau"
+                    Style="{StaticResource GhostButtonStyle}" />
             </StackPanel>
         </Grid>
 

@@ -12,6 +12,9 @@ public sealed class LibraryNavigationView : NavigationView
     private const string GroupCardsItemsPanelResourceKey =
         "NavigationGroupCardsItemsPanelTemplate";
 
+    public bool CanGoForward =>
+        NavigationViewContentPresenter?.CanGoForward == true;
+
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();

@@ -19,6 +19,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -65,11 +66,61 @@
             </ui:TitleBar.TrailingContent>
         </ui:TitleBar>
 
+        <StackPanel
+            Grid.Row="1"
+            Margin="4"
+            HorizontalAlignment="Left"
+            Orientation="Horizontal">
+            <StackPanel.Resources>
+                <SolidColorBrush
+                    x:Key="ButtonBackgroundDisabled"
+                    Color="Transparent" />
+                <SolidColorBrush
+                    x:Key="ButtonBorderBrushDisabled"
+                    Color="Transparent" />
+                <Style
+                    x:Key="NavigationCommandButtonStyle"
+                    BasedOn="{StaticResource IconButtonStyle}"
+                    TargetType="{x:Type ui:Button}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="MouseOverBorderBrush" Value="Transparent" />
+                    <Setter Property="PressedBorderBrush" Value="Transparent" />
+                </Style>
+            </StackPanel.Resources>
+            <ui:Button
+                AutomationProperties.Name="Quay lại"
+                Command="{Binding NavigateBackCommand}"
+                Icon="{ui:SymbolIcon ArrowLeft24}"
+                Style="{StaticResource NavigationCommandButtonStyle}"
+                ToolTip="Quay lại"
+                ToolTipService.ShowOnDisabled="True" />
+            <ui:Button
+                Margin="4,0,0,0"
+                AutomationProperties.Name="Đi tới"
+                Command="{Binding NavigateForwardCommand}"
+                Icon="{ui:SymbolIcon ArrowRight24}"
+                Style="{StaticResource NavigationCommandButtonStyle}"
+                ToolTip="Đi tới"
+                ToolTipService.ShowOnDisabled="True" />
+            <ui:Button
+                Margin="4,0,0,0"
+                AutomationProperties.Name="Làm mới trang hiện tại"
+                Command="{Binding ActiveRefreshTarget.RefreshCommand}"
+                Icon="{ui:SymbolIcon ArrowClockwise24}"
+                IsEnabled="{Binding ActiveRefreshTarget.IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                Style="{StaticResource NavigationCommandButtonStyle}"
+                ToolTip="Làm mới"
+                ToolTipService.ShowOnDisabled="True"
+                Visibility="{Binding IsRefreshAvailable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </StackPanel>
+
         <controls:LibraryNavigationView
             x:Name="RootNavigation"
-            Grid.Row="1"
-            IsBackButtonVisible="Visible"
+            Grid.Row="2"
+            IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="True"
+            Navigated="OnNavigated"
             OpenPaneLength="260"
             PaneDisplayMode="Left"
             PaneTitle="Thư viện">
@@ -194,7 +245,7 @@
         </controls:LibraryNavigationView>
 
         <Border
-            Grid.Row="1"
+            Grid.Row="2"
             Panel.ZIndex="100"
             Background="#66000000"
             Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -209,11 +260,11 @@
 
         <ui:SnackbarPresenter
             x:Name="RootSnackbarPresenter"
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Panel.ZIndex="200" />
         <ui:ContentDialogHost
             x:Name="RootContentDialogHost"
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Panel.ZIndex="300" />
     </Grid>
 </ui:FluentWindow>

@@ -60,7 +60,7 @@
                         TextWrapping="Wrap"
                         Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <ui:Button
-                        Margin="0,18,0,0"
+                        Margin="0,12,0,0"
                         HorizontalAlignment="Left"
                         Appearance="Primary"
                         Command="{Binding SaveCommand}"

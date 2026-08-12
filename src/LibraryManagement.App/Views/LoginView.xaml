@@ -120,7 +120,7 @@
                     Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
                 <ui:Button
-                    MinHeight="42"
+                    MinHeight="{StaticResource LargeButtonHeight}"
                     Margin="0,24,0,0"
                     HorizontalAlignment="Stretch"
                     Appearance="Primary"

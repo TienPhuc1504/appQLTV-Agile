@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LibraryManagement.App.Navigation;
 using LibraryManagement.Core.DTOs;
 using LibraryManagement.Core.Interfaces;
 using LibraryManagement.Core.Models;
@@ -8,7 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace LibraryManagement.App.ViewModels;
 
-public sealed partial class ActivityLogViewModel : BaseViewModel
+public sealed partial class ActivityLogViewModel :
+    BaseViewModel,
+    IRefreshableViewModel
 {
     private readonly IActivityLogService _activityLogService;
     private readonly ILogger<ActivityLogViewModel> _logger;
@@ -20,6 +23,8 @@ public sealed partial class ActivityLogViewModel : BaseViewModel
         _activityLogService = activityLogService;
         _logger = logger;
     }
+
+    IAsyncRelayCommand IRefreshableViewModel.RefreshCommand => LoadCommand;
 
     public ObservableCollection<ActivityLogDto> ActivityLogs { get; } = [];
 

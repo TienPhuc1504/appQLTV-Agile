@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LibraryManagement.App.Navigation;
 using LibraryManagement.Core.DTOs;
 using LibraryManagement.Core.Enums;
 using LibraryManagement.Core.Interfaces;
@@ -9,7 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace LibraryManagement.App.ViewModels;
 
-public sealed partial class DashboardViewModel : BaseViewModel
+public sealed partial class DashboardViewModel :
+    BaseViewModel,
+    IRefreshableViewModel
 {
     private readonly IDashboardService _dashboardService;
     private readonly IAuthenticationService _authenticationService;
@@ -24,6 +27,8 @@ public sealed partial class DashboardViewModel : BaseViewModel
         _authenticationService = authenticationService;
         _logger = logger;
     }
+
+    IAsyncRelayCommand IRefreshableViewModel.RefreshCommand => LoadCommand;
 
     [ObservableProperty]
     public partial DashboardSummaryDto Summary { get; private set; } =

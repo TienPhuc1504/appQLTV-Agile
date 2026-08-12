@@ -1,9 +1,54 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:LibraryManagement.App.Controls">
+    xmlns:controls="clr-namespace:LibraryManagement.App.Controls"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <sys:Double x:Key="ButtonHeight">36</sys:Double>
+    <sys:Double x:Key="LargeButtonHeight">44</sys:Double>
     <Thickness x:Key="PagePadding">24</Thickness>
     <GridLength x:Key="SectionSpacing">24</GridLength>
+
+    <Style
+        x:Key="PrimaryButtonStyle"
+        BasedOn="{StaticResource {x:Type ui:Button}}"
+        TargetType="{x:Type ui:Button}">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="Appearance" Value="Primary" />
+    </Style>
+
+    <Style
+        x:Key="SecondaryButtonStyle"
+        BasedOn="{StaticResource {x:Type ui:Button}}"
+        TargetType="{x:Type ui:Button}">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="Appearance" Value="Secondary" />
+    </Style>
+
+    <Style
+        x:Key="DangerButtonStyle"
+        BasedOn="{StaticResource {x:Type ui:Button}}"
+        TargetType="{x:Type ui:Button}">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="Appearance" Value="Danger" />
+    </Style>
+
+    <Style
+        x:Key="GhostButtonStyle"
+        BasedOn="{StaticResource {x:Type ui:Button}}"
+        TargetType="{x:Type ui:Button}">
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="Appearance" Value="Transparent" />
+    </Style>
+
+    <Style
+        x:Key="IconButtonStyle"
+        BasedOn="{StaticResource {x:Type ui:Button}}"
+        TargetType="{x:Type ui:Button}">
+        <Setter Property="MinWidth" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="MinHeight" Value="{StaticResource ButtonHeight}" />
+        <Setter Property="Appearance" Value="Transparent" />
+    </Style>
 
     <Style x:Key="PageTitleTextStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="FontSize" Value="28" />

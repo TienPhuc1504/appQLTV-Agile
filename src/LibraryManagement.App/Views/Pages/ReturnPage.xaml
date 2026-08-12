@@ -39,11 +39,12 @@
                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                 <ui:Button
                     Grid.Column="1"
-                    Margin="10,0,0,0"
+                    Margin="8,0,0,0"
                     AutomationProperties.Name="Tìm sách đang mượn"
                     Command="{Binding SearchCommand}"
                     Content="Tìm kiếm"
-                    Icon="{ui:SymbolIcon Search24}" />
+                    Icon="{ui:SymbolIcon Search24}"
+                    Style="{StaticResource SecondaryButtonStyle}" />
             </Grid>
         </Border>
 
@@ -193,12 +194,12 @@
                                 Content="Tính tiền phạt"
                                 Icon="{ui:SymbolIcon Calculator24}" />
                             <ui:Button
-                                Margin="10,0,0,0"
+                                Margin="8,0,0,0"
                                 AutomationProperties.Name="Gia hạn sách đã chọn"
                                 Command="{Binding RenewSelectedCommand}"
                                 Content="Gia hạn" />
                             <ui:Button
-                                Margin="10,0,0,0"
+                                Margin="8,0,0,0"
                                 Appearance="Primary"
                                 AutomationProperties.Name="Xác nhận trả sách"
                                 Command="{Binding ConfirmReturnCommand}"

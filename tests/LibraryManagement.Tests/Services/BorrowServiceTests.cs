@@ -45,6 +45,11 @@ public sealed class BorrowServiceTests
             SystemSettingKeys.MaximumBorrowedBooks,
             "1",
             cancellationToken);
+        await harness.PrepareRenewalDetailAsync(
+            1,
+            DateOnly.FromDateTime(DateTime.Today).AddDays(1),
+            renewalCount: 0,
+            cancellationToken);
         IBorrowService service =
             harness.Provider.GetRequiredService<IBorrowService>();
 
@@ -153,6 +158,11 @@ public sealed class BorrowServiceTests
         await harness.SetSettingAsync(
             SystemSettingKeys.MaximumBorrowedBooks,
             "1",
+            cancellationToken);
+        await harness.PrepareRenewalDetailAsync(
+            1,
+            DateOnly.FromDateTime(DateTime.Today).AddDays(1),
+            renewalCount: 0,
             cancellationToken);
         IBorrowService service =
             harness.Provider.GetRequiredService<IBorrowService>();

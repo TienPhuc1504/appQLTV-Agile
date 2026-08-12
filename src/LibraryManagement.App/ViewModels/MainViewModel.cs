@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using LibraryManagement.App.Dialogs;
 using LibraryManagement.App.Messages;
+using LibraryManagement.App.Navigation;
 using LibraryManagement.App.Themes;
 using LibraryManagement.Core.Enums;
 using LibraryManagement.Core.Interfaces;
@@ -14,15 +15,18 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
     private readonly ICurrentUserService _currentUserService;
     private readonly IAuthenticationService _authenticationService;
     private readonly IAppDialogService _dialogService;
+    private readonly IAppNavigationService _navigationService;
     private readonly IMessenger _messenger;
     private readonly IAppThemeService _themeService;
     private readonly ILogger<MainViewModel> _logger;
+    private IRefreshableViewModel? _activeRefreshTarget;
     private bool _disposed;
 
     public MainViewModel(
         ICurrentUserService currentUserService,
         IAuthenticationService authenticationService,
         IAppDialogService dialogService,
+        IAppNavigationService navigationService,
         IMessenger messenger,
         IAppThemeService themeService,
         ILogger<MainViewModel> logger)
@@ -30,10 +34,12 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
         _currentUserService = currentUserService;
         _authenticationService = authenticationService;
         _dialogService = dialogService;
+        _navigationService = navigationService;
         _messenger = messenger;
         _themeService = themeService;
         _logger = logger;
         _currentUserService.CurrentUserChanged += OnCurrentUserChanged;
+        _navigationService.NavigationStateChanged += OnNavigationStateChanged;
         _themeService.ThemeChanged += OnThemeChanged;
     }
 
@@ -58,6 +64,48 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
 
     public bool CanViewActivityLogs =>
         _authenticationService.CheckPermission(Permission.ViewActivityLogs);
+
+    public IRefreshableViewModel? ActiveRefreshTarget => _activeRefreshTarget;
+
+    public bool IsRefreshAvailable => _activeRefreshTarget is not null;
+
+    public void SetActiveRefreshTarget(IRefreshableViewModel? refreshTarget)
+    {
+        if (ReferenceEquals(_activeRefreshTarget, refreshTarget))
+        {
+            return;
+        }
+
+        _activeRefreshTarget = refreshTarget;
+        OnPropertyChanged(nameof(ActiveRefreshTarget));
+        OnPropertyChanged(nameof(IsRefreshAvailable));
+    }
+
+    public void ClearActiveRefreshTarget(IRefreshableViewModel refreshTarget)
+    {
+        ArgumentNullException.ThrowIfNull(refreshTarget);
+
+        if (ReferenceEquals(_activeRefreshTarget, refreshTarget))
+        {
+            SetActiveRefreshTarget(null);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanNavigateBack))]
+    private void NavigateBack()
+    {
+        _navigationService.GoBack();
+    }
+
+    private bool CanNavigateBack() => _navigationService.CanGoBack;
+
+    [RelayCommand(CanExecute = nameof(CanNavigateForward))]
+    private void NavigateForward()
+    {
+        _navigationService.GoForward();
+    }
+
+    private bool CanNavigateForward() => _navigationService.CanGoForward;
 
     [RelayCommand]
     private void ToggleTheme()
@@ -105,7 +153,9 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
         }
 
         _currentUserService.CurrentUserChanged -= OnCurrentUserChanged;
+        _navigationService.NavigationStateChanged -= OnNavigationStateChanged;
         _themeService.ThemeChanged -= OnThemeChanged;
+        _activeRefreshTarget = null;
         _disposed = true;
     }
 
@@ -121,6 +171,12 @@ public sealed partial class MainViewModel : BaseViewModel, IDisposable
     private void OnThemeChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(ThemeButtonText));
+    }
+
+    private void OnNavigationStateChanged(object? sender, EventArgs e)
+    {
+        NavigateBackCommand.NotifyCanExecuteChanged();
+        NavigateForwardCommand.NotifyCanExecuteChanged();
     }
 
     protected override string GetFriendlyErrorMessage(Exception exception)

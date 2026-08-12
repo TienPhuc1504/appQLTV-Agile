@@ -4,24 +4,31 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:LibraryManagement.App.Controls"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Quản lý độc giả"
     Loaded="OnLoaded"
     mc:Ignorable="d">
-    <Grid Margin="28">
+    <Grid Margin="{StaticResource PagePadding}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="{StaticResource SectionSpacing}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            FontSize="28"
-            FontWeight="SemiBold"
-            Text="Quản lý độc giả" />
+        <controls:PageHeader
+            Description="Quản lý hồ sơ, trạng thái thẻ và lịch sử sử dụng thư viện của độc giả."
+            Title="Quản lý độc giả">
+            <controls:PageHeader.TrailingContent>
+                <ui:Button
+                    Appearance="Primary"
+                    Command="{Binding NewCommand}"
+                    Content="Thêm độc giả" />
+            </controls:PageHeader.TrailingContent>
+        </controls:PageHeader>
 
         <TabControl
-            Grid.Row="1"
-            Margin="0,18,0,0"
+            Grid.Row="2"
             SelectedIndex="{Binding SelectedTabIndex}">
             <TabItem Header="Danh sách độc giả">
                 <Grid Margin="12">
@@ -44,21 +51,23 @@
                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
                         <ComboBox
                             Grid.Column="1"
-                            Margin="10,0,0,0"
+                            Margin="8,0,0,0"
                             DisplayMemberPath="DisplayName"
                             ItemsSource="{Binding StatusFilters}"
                             SelectedItem="{Binding SelectedStatusFilter}" />
                         <ComboBox
                             Grid.Column="2"
-                            Margin="10,0,0,0"
+                            Margin="8,0,0,0"
                             DisplayMemberPath="DisplayName"
                             ItemsSource="{Binding TypeFilters}"
                             SelectedItem="{Binding SelectedTypeFilter}" />
                         <ui:Button
                             Grid.Column="3"
-                            Margin="10,0,0,0"
+                            Margin="8,0,0,0"
                             Command="{Binding SearchCommand}"
-                            Content="Tìm kiếm" />
+                            Content="Tìm kiếm"
+                            Icon="{ui:SymbolIcon Search24}"
+                            Style="{StaticResource SecondaryButtonStyle}" />
                     </Grid>
 
                     <Grid Grid.Row="1" Margin="0,12,0,0">
@@ -131,21 +140,18 @@
                         </Grid.RowDefinitions>
                         <WrapPanel HorizontalAlignment="Left">
                             <ui:Button
-                                Appearance="Primary"
-                                Command="{Binding NewCommand}"
-                                Content="Thêm độc giả" />
-                            <ui:Button
-                                Margin="8,0,0,0"
                                 Command="{Binding EditCommand}"
                                 Content="Sửa" />
                             <ui:Button
                                 Margin="8,0,0,0"
                                 Command="{Binding LockCommand}"
-                                Content="Khóa" />
+                                Content="Khóa"
+                                Style="{StaticResource DangerButtonStyle}" />
                             <ui:Button
                                 Margin="8,0,0,0"
                                 Command="{Binding UnlockCommand}"
-                                Content="Mở khóa" />
+                                Content="Mở khóa"
+                                Style="{StaticResource SecondaryButtonStyle}" />
                             <ui:Button
                                 Margin="8,0,0,0"
                                 Command="{Binding RenewCardCommand}"
@@ -161,23 +167,25 @@
                         </WrapPanel>
                         <StackPanel
                             Grid.Row="1"
-                            Margin="0,10,0,0"
+                            Margin="0,8,0,0"
                             HorizontalAlignment="Center"
                             Orientation="Horizontal">
                             <ui:Button
                                 Command="{Binding PreviousPageCommand}"
-                                Content="Trước" />
+                                Content="Trước"
+                                Style="{StaticResource GhostButtonStyle}" />
                             <TextBlock
                                 Margin="12,0"
                                 VerticalAlignment="Center"
                                 Text="{Binding PageSummary}" />
                             <ui:Button
                                 Command="{Binding NextPageCommand}"
-                                Content="Sau" />
+                                Content="Sau"
+                                Style="{StaticResource GhostButtonStyle}" />
                         </StackPanel>
                         <StackPanel
                             Grid.Row="1"
-                            Margin="0,10,0,0"
+                            Margin="0,8,0,0"
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
                             <TextBlock
@@ -369,7 +377,7 @@
                                 TextWrapping="Wrap"
                                 Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
                             <ui:Button
-                                MinHeight="42"
+                                MinHeight="{StaticResource ButtonHeight}"
                                 Margin="0,16,0,0"
                                 Appearance="Primary"
                                 Command="{Binding SaveCommand}"
@@ -497,7 +505,7 @@
         </TabControl>
 
         <Border
-            Grid.RowSpan="2"
+            Grid.RowSpan="3"
             Panel.ZIndex="50"
             Background="#66000000"
             Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">

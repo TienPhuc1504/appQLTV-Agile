@@ -94,7 +94,9 @@
                                 Grid.Column="1"
                                 Margin="8,0,0,0"
                                 Command="{Binding SearchReaderCommand}"
-                                Content="Tìm độc giả" />
+                                Content="Tìm độc giả"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Style="{StaticResource SecondaryButtonStyle}" />
                         </Grid>
                         <Grid Grid.Row="2">
                             <DataGrid
@@ -174,7 +176,7 @@
                                 </StackPanel>
                                 <ui:Button
                                     Grid.Column="1"
-                                    Margin="10,0,0,0"
+                                    Margin="8,0,0,0"
                                     Command="{Binding CheckReaderEligibilityCommand}"
                                     Content="Kiểm tra điều kiện" />
                             </Grid>
@@ -221,13 +223,15 @@
                                 Grid.Column="1"
                                 Margin="8,0,0,0"
                                 Command="{Binding SearchBookCopiesCommand}"
-                                Content="Tìm" />
+                                Content="Tìm"
+                                Icon="{ui:SymbolIcon Search24}"
+                                Style="{StaticResource SecondaryButtonStyle}" />
                             <ui:Button
                                 Grid.Column="2"
                                 Margin="8,0,0,0"
-                                Appearance="Primary"
                                 Command="{Binding AddCopyCommand}"
-                                Content="Thêm" />
+                                Content="Thêm"
+                                Style="{StaticResource SecondaryButtonStyle}" />
                         </Grid>
                         <Grid Grid.Row="2">
                             <DataGrid
@@ -404,12 +408,12 @@
                         <ui:Button
                             Grid.Column="6"
                             MinWidth="150"
-                            MinHeight="44"
+                            MinHeight="{StaticResource LargeButtonHeight}"
                             VerticalAlignment="Center"
-                            Appearance="Primary"
                             AutomationProperties.Name="Xác nhận lập phiếu"
                             Command="{Binding ConfirmBorrowCommand}"
-                            Content="Xác nhận lập phiếu" />
+                            Content="Xác nhận lập phiếu"
+                            Style="{StaticResource PrimaryButtonStyle}" />
                     </Grid>
                 </Border>
             </Grid>

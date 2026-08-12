@@ -38,7 +38,12 @@
                 Text="{Binding EmployeeIdFilter, UpdateSourceTrigger=PropertyChanged}" />
             <DatePicker Grid.Column="3" Margin="0,0,8,0" SelectedDate="{Binding FromDate}" />
             <DatePicker Grid.Column="4" Margin="0,0,8,0" SelectedDate="{Binding ToDate}" />
-            <ui:Button Grid.Column="5" Command="{Binding SearchCommand}" Content="Tìm kiếm" />
+            <ui:Button
+                Grid.Column="5"
+                Command="{Binding SearchCommand}"
+                Content="Tìm kiếm"
+                Icon="{ui:SymbolIcon Search24}"
+                Style="{StaticResource SecondaryButtonStyle}" />
         </Grid>
         <DataGrid
             Grid.Row="2"
@@ -56,17 +61,17 @@
                 <DataGridTextColumn Width="*" Binding="{Binding Description}" Header="Mô tả" />
             </DataGrid.Columns>
         </DataGrid>
-        <Grid Grid.Row="3" Margin="0,14,0,0">
+        <Grid Grid.Row="3" Margin="0,12,0,0">
             <TextBlock
                 Foreground="{DynamicResource SystemFillColorCriticalBrush}"
                 Text="{Binding ErrorMessage}"
                 Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}}" />
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                <ui:Button Command="{Binding PreviousPageCommand}" Content="Trước" />
-                <TextBlock Margin="14,0" VerticalAlignment="Center" Text="{Binding PageNumber, StringFormat=Trang {0}}" />
+                <ui:Button Command="{Binding PreviousPageCommand}" Content="Trước" Style="{StaticResource GhostButtonStyle}" />
+                <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding PageNumber, StringFormat=Trang {0}}" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding TotalPages, StringFormat=/ {0}}" />
-                <ui:Button Margin="14,0,0,0" Command="{Binding NextPageCommand}" Content="Sau" />
-                <TextBlock Margin="18,0,0,0" VerticalAlignment="Center" Text="{Binding TotalCount, StringFormat=Tổng: {0}}" />
+                <ui:Button Margin="8,0,0,0" Command="{Binding NextPageCommand}" Content="Sau" Style="{StaticResource GhostButtonStyle}" />
+                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding TotalCount, StringFormat=Tổng: {0}}" />
             </StackPanel>
         </Grid>
         <Border

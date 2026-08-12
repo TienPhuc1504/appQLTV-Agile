@@ -24,17 +24,19 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <ui:TextBox
-                Margin="0,0,10,0"
+                Margin="0,0,8,0"
                 AutomationProperties.Name="Tìm nhân viên"
                 PlaceholderText="Mã, tên hoặc tên đăng nhập..."
                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             <ui:Button
                 Grid.Column="1"
                 Command="{Binding SearchCommand}"
-                Content="Tìm kiếm" />
+                Content="Tìm kiếm"
+                Icon="{ui:SymbolIcon Search24}"
+                Style="{StaticResource SecondaryButtonStyle}" />
             <ui:Button
                 Grid.Column="2"
-                Margin="10,0,0,0"
+                Margin="12,0,0,0"
                 Appearance="Primary"
                 Command="{Binding NewCommand}"
                 Content="Thêm nhân viên" />
@@ -119,20 +121,32 @@
                         <WrapPanel Margin="0,16,0,0">
                             <ui:Button Appearance="Primary" Command="{Binding SaveCommand}" Content="Lưu" />
                             <ui:Button Margin="8,0,0,0" Command="{Binding ChangeRoleCommand}" Content="Đổi vai trò" />
-                            <ui:Button Margin="8,0,0,0" Command="{Binding ResetPasswordCommand}" Content="Reset mật khẩu" />
-                            <ui:Button Margin="0,8,0,0" Command="{Binding LockCommand}" Content="Khóa" />
-                            <ui:Button Margin="8,8,0,0" Command="{Binding UnlockCommand}" Content="Mở khóa" />
+                            <ui:Button
+                                Margin="8,0,0,0"
+                                Appearance="Caution"
+                                Command="{Binding ResetPasswordCommand}"
+                                Content="Reset mật khẩu" />
+                            <ui:Button
+                                Margin="0,8,0,0"
+                                Command="{Binding LockCommand}"
+                                Content="Khóa"
+                                Style="{StaticResource DangerButtonStyle}" />
+                            <ui:Button
+                                Margin="8,8,0,0"
+                                Command="{Binding UnlockCommand}"
+                                Content="Mở khóa"
+                                Style="{StaticResource SecondaryButtonStyle}" />
                         </WrapPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
         </Grid>
-        <StackPanel Grid.Row="3" Margin="0,14,0,0" HorizontalAlignment="Center" Orientation="Horizontal">
-            <ui:Button Command="{Binding PreviousPageCommand}" Content="Trước" />
-            <TextBlock Margin="14,0" VerticalAlignment="Center" Text="{Binding PageNumber, StringFormat=Trang {0}}" />
+        <StackPanel Grid.Row="3" Margin="0,12,0,0" HorizontalAlignment="Center" Orientation="Horizontal">
+            <ui:Button Command="{Binding PreviousPageCommand}" Content="Trước" Style="{StaticResource GhostButtonStyle}" />
+            <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding PageNumber, StringFormat=Trang {0}}" />
             <TextBlock VerticalAlignment="Center" Text="{Binding TotalPages, StringFormat=/ {0}}" />
-            <ui:Button Margin="14,0,0,0" Command="{Binding NextPageCommand}" Content="Sau" />
-            <TextBlock Margin="18,0,0,0" VerticalAlignment="Center" Text="{Binding TotalCount, StringFormat=Tổng: {0}}" />
+            <ui:Button Margin="8,0,0,0" Command="{Binding NextPageCommand}" Content="Sau" Style="{StaticResource GhostButtonStyle}" />
+            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Text="{Binding TotalCount, StringFormat=Tổng: {0}}" />
         </StackPanel>
         <Border
             Grid.RowSpan="4"

@@ -1,6 +1,7 @@
 using LibraryManagement.App.Navigation;
 using LibraryManagement.App.ViewModels;
 using LibraryManagement.App.Views.Pages;
+using System.Windows;
 using Wpf.Ui;
 using Wpf.Ui.Controls;
 
@@ -9,6 +10,8 @@ namespace LibraryManagement.App.Views;
 public partial class MainWindow : FluentWindow
 {
     private readonly IAppNavigationService _navigationService;
+    private readonly MainViewModel _viewModel;
+    private IRefreshableViewModel? _activeRefreshTarget;
 
     public MainWindow(
         MainViewModel viewModel,
@@ -19,6 +22,7 @@ public partial class MainWindow : FluentWindow
     {
         InitializeComponent();
         DataContext = viewModel;
+        _viewModel = viewModel;
         _navigationService = navigationService;
 
         RootNavigation.SetServiceProvider(serviceProvider);
@@ -37,7 +41,24 @@ public partial class MainWindow : FluentWindow
 
     private void OnClosed(object? sender, EventArgs e)
     {
+        if (_activeRefreshTarget is not null)
+        {
+            _viewModel.ClearActiveRefreshTarget(_activeRefreshTarget);
+            _activeRefreshTarget = null;
+        }
+
         Loaded -= OnLoaded;
         Closed -= OnClosed;
+    }
+
+    private void OnNavigated(
+        NavigationView sender,
+        NavigatedEventArgs args)
+    {
+        IRefreshableViewModel? refreshTarget =
+            (args.Page as FrameworkElement)?.DataContext
+            as IRefreshableViewModel;
+        _activeRefreshTarget = refreshTarget;
+        _viewModel.SetActiveRefreshTarget(refreshTarget);
     }
 }
